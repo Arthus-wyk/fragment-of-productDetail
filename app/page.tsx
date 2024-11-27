@@ -18,7 +18,7 @@ import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
 import { usePostHog } from 'posthog-js/react'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function Home() {
@@ -30,7 +30,7 @@ export default function Home() {
   const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
     'languageModel',
     {
-      model: 'claude-3-5-sonnet-20240620',
+      model: 'claude-3-5-sonnet-latest',
     },
   )
 
@@ -200,8 +200,8 @@ export default function Home() {
     setChatInput(e.target.value)
   }
 
-  function handleFileChange(files: File[]) {
-    setFiles(files)
+  function handleFileChange(change: SetStateAction<File[]>) {
+    setFiles(change)
   }
 
   function logout() {
@@ -212,6 +212,7 @@ export default function Home() {
 
   function handleLanguageModelChange(e: LLMModelConfig) {
     setLanguageModel({ ...languageModel, ...e })
+    console.log(languageModel)
   }
 
   function handleSocialClick(target: 'github' | 'x' | 'discord') {

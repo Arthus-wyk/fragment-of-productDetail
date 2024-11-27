@@ -64,10 +64,17 @@
       "multiModal": true
     },
     {
-      "id": "models/gemini-1.5-flash-002",
+      "id": "models/gemini-1.5-flash",
       "provider": "Google Generative AI",
       "providerId": "google",
       "name": "Gemini Flash",
+      "multiModal": true
+    },
+    {
+      "id": "models/gemini-1.5-flash:latest",
+      "provider": "Google Generative AI",
+      "providerId": "google",
+      "name": "Gemini Flash Lastest",
       "multiModal": true
     },
     {
@@ -145,6 +152,13 @@
       "provider": "Ollama",
       "providerId": "ollama",
       "name": "Mistral Large",
+      "multiModal": false
+    },
+    {
+      "id": "百度-116382700",
+      "provider": "百度",
+      "providerId": "百度",
+      "name": "百度",
       "multiModal": false
     }
   ]

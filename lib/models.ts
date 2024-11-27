@@ -27,12 +27,17 @@ export type LLMModelConfig = {
 export function getModelClient(model: LLMModel, config: LLMModelConfig) {
   const { id: modelNameString, providerId } = model
   const { apiKey, baseURL } = config
+  console.log("api key:",apiKey)
+  console.log("baseurl:",baseURL)
 
   const providerConfigs = {
     anthropic: () => createAnthropic({ apiKey, baseURL })(modelNameString),
     openai: () => createOpenAI({ apiKey, baseURL })(modelNameString),
     google: () =>
-      createGoogleGenerativeAI({ apiKey, baseURL })(modelNameString),
+      createGoogleGenerativeAI({
+         apiKey,
+         baseURL
+        })(modelNameString),
     mistral: () => createMistral({ apiKey, baseURL })(modelNameString),
     groq: () =>
       createOpenAI({
@@ -51,6 +56,8 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
         baseURL: baseURL || 'https://api.fireworks.ai/inference/v1',
       })(modelNameString),
     vertex: () => createVertex({ googleAuthOptions: { credentials: JSON.parse(process.env.GOOGLE_VERTEX_CREDENTIALS || '{}') } })(modelNameString),
+    baidu: () => createOpenAI({ apiKey: process.env.BAIDU_API_KEY, baseURL:  'https://aip.baidubce.com/rest/2.0/ocr/v1' })(modelNameString),
+
   }
 
   const createClient =

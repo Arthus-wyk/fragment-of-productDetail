@@ -1,3 +1,4 @@
+
 import { Duration } from '@/lib/duration'
 import { getModelClient, getDefaultMode } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
@@ -5,7 +6,10 @@ import { toPrompt } from '@/lib/prompt'
 import ratelimit from '@/lib/ratelimit'
 import { fragmentSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
-import { streamObject, LanguageModel, CoreMessage } from 'ai'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { openai } from '@ai-sdk/openai'
+import { CoreMessage, LanguageModel, streamObject } from 'ai'
+import { error } from 'console'
 
 export const maxDuration = 60
 
@@ -51,21 +55,39 @@ export async function POST(req: Request) {
   }
 
   console.log('userID', userID)
-  // console.log('template', template)
+  console.log('template',template)
+  console.log('template to prompt', toPrompt(template))
+
   console.log('model', model)
-  // console.log('config', config)
+  console.log('config', config)
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
-  const modelClient = getModelClient(model, config)
+  const client = createGoogleGenerativeAI({ apiKey : process.env.GOOGLE_GENERATIVE_AI_API_KEY})
+  ('models/gemini-1.5-flash-latest')
 
-  const stream = await streamObject({
-    model: modelClient as LanguageModel,
-    schema,
-    system: toPrompt(template),
-    messages,
-    mode: getDefaultMode(model),
-    ...modelParams,
-  })
 
-  return stream.toTextStreamResponse()
+  try{
+    const stream = await streamObject({
+      model: client as LanguageModel,
+      schema,
+      system: toPrompt(template),
+      messages,
+      mode: getDefaultMode(model),
+      ...modelParams,
+      maxRetries:10
+    })
+    return stream.toTextStreamResponse()
+  }
+  catch(error)
+  {
+    console.log("error",error)
+    return new Response('error.!!'+error, {
+      status: 500,
+    })
+  }
+
+  // console.log('stream',stream)
+
+
+
 }

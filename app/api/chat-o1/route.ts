@@ -52,9 +52,9 @@ export async function POST(req: Request) {
   }
 
   console.log('userID', userID)
-  // console.log('template', template)
+  console.log('template', template)
   console.log('model', model)
-  // console.log('config', config)
+  console.log('config', config)
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
   const modelClient = getModelClient(model, config)
