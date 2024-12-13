@@ -13,7 +13,7 @@ import { useState } from 'react'
 export function FragmentWeb({ result }: { result: ExecutionResultWeb }) {
   const [iframeKey, setIframeKey] = useState(0)
   if (!result) return null
-
+  console.log(result)
   function refreshIframe() {
     setIframeKey((prevKey) => prevKey + 1)
   }

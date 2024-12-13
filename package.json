@@ -14,6 +14,7 @@
     "@ai-sdk/google-vertex": "^0.0.39",
     "@ai-sdk/mistral": "^0.0.37",
     "@ai-sdk/openai": "^0.0.59",
+    "@e2b/cli": "^1.0.6",
     "@e2b/code-interpreter": "^1.0.2",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",

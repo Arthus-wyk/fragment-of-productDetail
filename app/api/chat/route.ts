@@ -54,21 +54,17 @@ export async function POST(req: Request) {
     })
   }
 
-  console.log('userID', userID)
-  console.log('template',template)
-  console.log('template to prompt', toPrompt(template))
-
-  console.log('model', model)
-  console.log('config', config)
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
-  const client = createGoogleGenerativeAI({ apiKey : process.env.GOOGLE_GENERATIVE_AI_API_KEY})
-  ('models/gemini-1.5-flash-latest')
+  const modelClient = getModelClient(model, config)
+
 
 
   try{
+    // console.log("系统提示词：",toPrompt(template))
+    // console.log("用户提示词：",messages)
     const stream = await streamObject({
-      model: client as LanguageModel,
+      model: modelClient as LanguageModel,
       schema,
       system: toPrompt(template),
       messages,
