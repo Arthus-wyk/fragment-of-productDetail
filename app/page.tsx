@@ -5,6 +5,7 @@ import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
 import { ChatPicker } from '@/components/chat-picker'
 import { ChatSettings } from '@/components/chat-settings'
+import Hero from '@/components/hero'
 import { NavBar } from '@/components/navbar'
 import { Preview } from '@/components/preview'
 import { AuthViewType, useAuth } from '@/lib/auth'
@@ -23,7 +24,7 @@ import { useLocalStorage } from 'usehooks-ts'
 
 export default function Home() {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
-  const [files, setFiles] = useState<File[]>([])
+  const [files, setFiles] = useState<string[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
     'auto',
   )
@@ -150,7 +151,7 @@ export default function Home() {
     }
 
     const content: Message['content'] = [{ type: 'text', text: chatInput }]
-    const images = await toMessageImage(files)
+    const images = files
 
     if (images.length > 0) {
       images.forEach((image) => {
@@ -200,7 +201,8 @@ export default function Home() {
     setChatInput(e.target.value)
   }
 
-  function handleFileChange(change: SetStateAction<File[]>) {
+  function handleFileChange(change: string[]) {
+    console.log("当前图片:", change)
     setFiles(change)
   }
 
@@ -217,11 +219,7 @@ export default function Home() {
 
   function handleSocialClick(target: 'github' | 'x' | 'discord') {
     if (target === 'github') {
-      window.open('https://github.com/e2b-dev/fragments', '_blank')
-    } else if (target === 'x') {
-      window.open('https://x.com/e2b_dev', '_blank')
-    } else if (target === 'discord') {
-      window.open('https://discord.gg/U7KEcGErtQ', '_blank')
+      window.open('https://github.com/Arthus-wyk/fragment-of-productDetail', '_blank')
     }
 
     posthog.capture(`${target}_click`)
@@ -252,7 +250,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen max-h-screen">
+    <main className=" min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-600">
       {supabase && (
         <AuthDialog
           open={isAuthDialogOpen}
@@ -261,65 +259,22 @@ export default function Home() {
           supabase={supabase}
         />
       )}
-      <div className="grid w-full md:grid-cols-2">
-        <div
-          className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-2'}`}
-        >
-          <NavBar
-            session={session}
-            showLogin={() => setAuthDialog(true)}
-            signOut={logout}
-            onSocialClick={handleSocialClick}
-            onClear={handleClearChat}
-            canClear={messages.length > 0}
-            canUndo={messages.length > 1 && !isLoading}
-            onUndo={handleUndo}
-          />
-          <Chat
-            messages={messages}
-            isLoading={isLoading}
-            setCurrentPreview={setCurrentPreview}
-          />
-          <ChatInput
-            retry={retry}
-            isErrored={error !== undefined}
-            isLoading={isLoading}
-            isRateLimited={isRateLimited}
-            stop={stop}
-            input={chatInput}
-            handleInputChange={handleSaveInputChange}
-            handleSubmit={handleSubmitAuth}
-            isMultiModal={currentModel?.multiModal || false}
-            files={files}
-            handleFileChange={handleFileChange}
-          >
-            <ChatPicker
-              templates={templates}
-              selectedTemplate={selectedTemplate}
-              onSelectedTemplateChange={setSelectedTemplate}
-              models={modelsList.models}
-              languageModel={languageModel}
-              onLanguageModelChange={handleLanguageModelChange}
-            />
-            <ChatSettings
-              languageModel={languageModel}
-              onLanguageModelChange={handleLanguageModelChange}
-              apiKeyConfigurable={!process.env.NEXT_PUBLIC_NO_API_KEY_INPUT}
-              baseURLConfigurable={!process.env.NEXT_PUBLIC_NO_BASE_URL_INPUT}
-            />
-          </ChatInput>
-        </div>
-        <Preview
-          apiKey={apiKey}
-          selectedTab={currentTab}
-          onSelectedTabChange={setCurrentTab}
-          isChatLoading={isLoading}
-          isPreviewLoading={isPreviewLoading}
-          fragment={fragment}
-          result={result as ExecutionResult}
-          onClose={() => setFragment(undefined)}
-        />
-      </div>
+
+
+      <NavBar
+        session={session}
+        showLogin={() => setAuthDialog(true)}
+        signOut={logout}
+        onSocialClick={handleSocialClick}
+        onClear={handleClearChat}
+        canClear={messages.length > 0}
+        canUndo={messages.length > 1 && !isLoading}
+        onUndo={handleUndo}
+      />
+      <Hero />
+
+
+
     </main>
   )
 }

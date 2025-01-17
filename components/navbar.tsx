@@ -51,71 +51,18 @@ export function NavBar({
   onUndo: () => void
   canUndo: boolean
 }) {
-  const { setTheme, theme } = useTheme()
+
   return (
-    <nav className="w-full flex bg-background py-4">
+    <nav className="flex h-14 p-4 bg-white sticky top-0 z-50  border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex flex-1 items-center">
-        <Link href="/" className="flex items-center gap-2" target="_blank">
+        <Link href="/" className="flex items-center gap-2 " target="_blank">
           <Logo width={24} height={24} />
-          <h1 className="whitespace-pre">Fragments by </h1>
+          <h1 className="whitespace-pre font-bold">Product Generate Fragments </h1>
         </Link>
-        <Link
-          href="https://e2b.dev"
-          className="underline decoration-[rgba(229,123,0,.3)] decoration-2 text-[#ff8800]"
-          target="_blank"
-        >
-          E2B
-        </Link>
+        
       </div>
       <div className="flex items-center gap-1 md:gap-4">
-        <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onUndo}
-                disabled={!canUndo}
-              >
-                <Undo className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Undo</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClear}
-                disabled={!canClear}
-              >
-                <Trash className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Clear chat</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                {theme === 'light' ? (
-                  <SunIcon className="h-4 w-4 md:h-5 md:w-5" />
-                ) : (
-                  <MoonIcon className="h-4 w-4 md:h-5 md:w-5" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle theme</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+   
         {session ? (
           <DropdownMenu>
             <TooltipProvider>
@@ -144,25 +91,10 @@ export function NavBar({
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  window.open('https://e2b.dev', '_blank')
-                }}
-              >
-                <Logo className="mr-2 h-4 w-4 text-muted-foreground" />
-                About E2B
-              </DropdownMenuItem>
+             
               <DropdownMenuItem onClick={() => onSocialClick('github')}>
                 <GitHubLogoIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                 Star us on GitHub
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSocialClick('discord')}>
-                <DiscordLogoIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                Join us on Discord
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSocialClick('x')}>
-                <TwitterLogoIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                Follow us on X
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>

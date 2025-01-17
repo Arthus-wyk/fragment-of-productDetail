@@ -6,10 +6,8 @@ import { toPrompt } from '@/lib/prompt'
 import ratelimit from '@/lib/ratelimit'
 import { fragmentSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
-import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
 import { CoreMessage, LanguageModel, streamObject } from 'ai'
-import { error } from 'console'
+
 
 export const maxDuration = 60
 
@@ -57,20 +55,20 @@ export async function POST(req: Request) {
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
   const modelClient = getModelClient(model, config)
-
+  console.log("tem:",template)
 
 
   try{
-    // console.log("系统提示词：",toPrompt(template))
-    // console.log("用户提示词：",messages)
+    console.log("系统提示词：",toPrompt())
+    console.log("用户提示词：",messages)
     const stream = await streamObject({
       model: modelClient as LanguageModel,
       schema,
-      system: toPrompt(template),
+      system: toPrompt(),
       messages,
       mode: getDefaultMode(model),
       ...modelParams,
-      maxRetries:10
+      maxRetries:1
     })
     return stream.toTextStreamResponse()
   }

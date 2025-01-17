@@ -8,6 +8,7 @@ import {
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react'
 import { useMemo } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
+import UploadQiNiu from './uploadQiNiu'
 
 export function ChatInput({
   retry,
@@ -21,7 +22,6 @@ export function ChatInput({
   isMultiModal,
   files,
   handleFileChange,
-  children,
 }: {
   retry: () => void
   isErrored: boolean
@@ -32,39 +32,39 @@ export function ChatInput({
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isMultiModal: boolean
-  files: File[]
-  handleFileChange: (files: File[]) => void
-  children: React.ReactNode
+  files: string[]
+  handleFileChange: (files: string[]) => void
+
 }) {
-  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
-    handleFileChange(Array.from(e.target.files || []))
-  }
+  // function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+  //   handleFileChange(Array.from(e.target.files || []))
+  // }
 
-  function handleFileRemove(file: File) {
-    const newFiles = files ? Array.from(files).filter((f) => f !== file) : []
-    handleFileChange(newFiles)
-  }
+  // function handleFileRemove(file: File) {
+  //   const newFiles = files ? Array.from(files).filter((f) => f !== file) : []
+  //   handleFileChange(newFiles)
+  // }
 
-  const filePreview = useMemo(() => {
-    if (files.length === 0) return null
-    return Array.from(files).map((file) => {
-      return (
-        <div className="relative" key={file.name}>
-          <span
-            onClick={() => handleFileRemove(file)}
-            className="absolute top-[-8] right-[-8] bg-muted rounded-full p-1"
-          >
-            <X className="h-3 w-3" />
-          </span>
-          <img
-            src={URL.createObjectURL(file)}
-            alt={file.name}
-            className="rounded-xl w-10 h-10 object-cover"
-          />
-        </div>
-      )
-    })
-  }, [files])
+  // const filePreview = useMemo(() => {
+  //   if (files.length === 0) return null
+  //   return Array.from(files).map((file) => {
+  //     return (
+  //       <div className="relative" key={file.name}>
+  //         <span
+  //           onClick={() => handleFileRemove(file)}
+  //           className="absolute top-[-8] right-[-8] bg-muted rounded-full p-1"
+  //         >
+  //           <X className="h-3 w-3" />
+  //         </span>
+  //         <img
+  //           src={URL.createObjectURL(file)}
+  //           alt={file.name}
+  //           className="rounded-xl w-10 h-10 object-cover"
+  //         />
+  //       </div>
+  //     )
+  //   })
+  // }, [files])
 
   function onEnter(e: React.KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -107,7 +107,7 @@ export function ChatInput({
         </div>
       )}
       <div className="shadow-md rounded-2xl border">
-        <div className="flex items-center px-3 py-2 gap-1">{children}</div>
+        {/* <div className="flex items-center px-3 py-2 gap-1">{children}</div> */}
         <TextareaAutosize
           autoFocus={true}
           minRows={1}
@@ -120,7 +120,7 @@ export function ChatInput({
           onChange={handleInputChange}
         />
         <div className="flex p-3 gap-2 items-center">
-          <input
+          {/* <input
             type="file"
             id="multimodal"
             name="multimodal"
@@ -128,12 +128,13 @@ export function ChatInput({
             multiple={true}
             className="hidden"
             onChange={handleFileInput}
-          />
+          /> */
+          <UploadQiNiu onFileContentRead={handleFileChange}/>}
           <div className="flex items-center flex-1 gap-2">
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button
+                  {/* <Button
                     disabled={!isMultiModal || isErrored}
                     type="button"
                     variant="outline"
@@ -145,12 +146,13 @@ export function ChatInput({
                     }}
                   >
                     <Paperclip className="h-5 w-5" />
-                  </Button>
+                  </Button> */}
+
                 </TooltipTrigger>
                 <TooltipContent>Add attachments</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            {files.length > 0 && filePreview}
+             {/* {files.length > 0 && filePreview} */}
           </div>
           <div>
             {!isLoading ? (

@@ -34,7 +34,7 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
     openai: () => createOpenAI({ apiKey, baseURL })(modelNameString),
     google: () =>
       createGoogleGenerativeAI({
-         apiKey:'AIzaSyD2IO08MhBpb2U-0s5SLhKvajXCMD5rOzQ',
+         apiKey:process.env.GOOGLE_GENERATIVE_AI_API_KEY,
          baseURL
         })(modelNameString),
     mistral: () => createMistral({ apiKey, baseURL })(modelNameString),
