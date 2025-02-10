@@ -12,6 +12,8 @@ import { useState } from 'react'
 
 export function FragmentWeb({ result }: { result: ExecutionResultWeb }) {
   const [iframeKey, setIframeKey] = useState(0)
+  const encodedHTML = encodeURIComponent(result.code);
+  const dataURI = `data:text/html;charset=utf-8,${encodedHTML}`;
   if (!result) return null
   console.log(result)
   function refreshIframe() {
@@ -25,7 +27,7 @@ export function FragmentWeb({ result }: { result: ExecutionResultWeb }) {
         className="h-full w-full"
         sandbox="allow-forms allow-scripts allow-same-origin"
         loading="lazy"
-        src={result.url}
+        src={dataURI}
       />
       <div className="p-2 border-t">
         <div className="flex items-center bg-muted dark:bg-white/10 rounded-2xl">
@@ -41,21 +43,6 @@ export function FragmentWeb({ result }: { result: ExecutionResultWeb }) {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Refresh</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <span className="text-muted-foreground text-xs flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
-            {result.url}
-          </span>
-          <TooltipProvider>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <CopyButton
-                  variant="link"
-                  content={result.url}
-                  className="text-muted-foreground"
-                />
-              </TooltipTrigger>
-              <TooltipContent>Copy URL</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

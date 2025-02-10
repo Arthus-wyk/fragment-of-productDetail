@@ -1,5 +1,5 @@
 import { Message } from '@/lib/messages'
-import { FragmentSchema } from '@/lib/schema'
+import { ArtifactSchema } from '@/lib/schema'
 import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { Loader2Icon, LoaderIcon, Terminal } from 'lucide-react'
@@ -13,7 +13,7 @@ export function Chat({
   messages: Message[]
   isLoading: boolean
   setCurrentPreview: (preview: {
-    fragment: DeepPartial<FragmentSchema> | undefined
+    fragment: DeepPartial<ArtifactSchema> | undefined
     result: ExecutionResult | undefined
   }) => void
 }) {

@@ -9,14 +9,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { FragmentSchema } from '@/lib/schema'
+import { ArtifactSchema } from '@/lib/schema'
 import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { ChevronsRight, LoaderCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
 export function Preview({
-  apiKey,
+  // apiKey,
   selectedTab,
   onSelectedTabChange,
   isChatLoading,
@@ -25,12 +25,12 @@ export function Preview({
   result,
   onClose,
 }: {
-  apiKey: string | undefined
+  // apiKey: string | undefined
   selectedTab: 'code' | 'fragment'
   onSelectedTabChange: Dispatch<SetStateAction<'code' | 'fragment'>>
   isChatLoading: boolean
   isPreviewLoading: boolean
-  fragment?: DeepPartial<FragmentSchema>
+  fragment?: DeepPartial<ArtifactSchema>
   result?: ExecutionResult
   onClose: () => void
 }) {
@@ -38,7 +38,7 @@ export function Preview({
     return null
   }
 
-  const isLinkAvailable = result?.template !== 'code-interpreter-v1'
+
 
   return (
     <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y bg-popover h-full w-full overflow-auto">
@@ -94,26 +94,16 @@ export function Preview({
               </TabsTrigger>
             </TabsList>
           </div>
-          {result && (
-            <div className="flex items-center justify-end gap-2">
-              {isLinkAvailable && (
-                <DeployDialog
-                  url={result.url!}
-                  sbxId={result.sbxId!}
-                  apiKey={apiKey}
-                />
-              )}
-            </div>
-          )}
+
         </div>
         {fragment && (
           <div className="overflow-y-auto w-full h-full">
             <TabsContent value="code" className="h-full">
-              {fragment.code && fragment.file_path && (
+              {fragment.code && fragment.title && (
                 <FragmentCode
                   files={[
                     {
-                      name: fragment.file_path,
+                      name: fragment.title,
                       content: fragment.code,
                     },
                   ]}

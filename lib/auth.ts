@@ -1,7 +1,8 @@
-import { supabase } from './supabase'
+
 import { Session } from '@supabase/supabase-js'
 import { usePostHog } from 'posthog-js/react'
 import { useState, useEffect } from 'react'
+import { supabase } from './utils/supabase/client'
 
 export type AuthViewType =
   | 'sign_in'
@@ -62,6 +63,7 @@ export function useAuth(
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (session) {
+        console.log("useAuth session:",session)
         getUserAPIKey(session).then(setApiKey)
         posthog.identify(session?.user.id, {
           email: session?.user.email,

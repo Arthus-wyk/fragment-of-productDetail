@@ -3,30 +3,33 @@
 import { AuthDialog } from '@/components/auth-dialog'
 import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
-import { ChatPicker } from '@/components/chat-picker'
-import { ChatSettings } from '@/components/chat-settings'
-import { NavBar } from '@/components/navbar'
 import { Preview } from '@/components/preview'
 import { AuthViewType, useAuth } from '@/lib/auth'
 import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
 import { LLMModelConfig } from '@/lib/models'
 import modelsList from '@/lib/models.json'
-import { artifactSchema, FragmentSchema, fragmentSchema as schema } from '@/lib/schema'
-import { supabase } from '@/lib/supabase'
+import { artifactSchema, ArtifactSchema } from '@/lib/schema'
 import templates, { TemplateId } from '@/lib/templates'
-import { ExecutionResult } from '@/lib/types'
+import { ExecutionResult, questionQuery } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
 import { usePostHog } from 'posthog-js/react'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
-import { useRouter, useSearchParams } from 'next/navigation';
 import { create_prompt } from '@/lib/create_prompt'
+import { NavBar } from '@/components/navbar'
+import { supabase } from '@/lib/utils/supabase/client'
+import Form from '@/components/form'
+import { addNewChat, addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
+import { useRouter } from 'next/router'
 
-export default function Home() {
-    const searchParams = useSearchParams();  // 获取查询参数
-    const router = useRouter();
-   
+export default function WebGenerator({
+    params
+}: {
+    params: { id: string };
+}) {
+
+
 
     const [chatInput, setChatInput] = useLocalStorage('chat', '')
     const [files, setFiles] = useState<string[]>([])
@@ -39,13 +42,12 @@ export default function Home() {
             model: 'claude-3-5-sonnet-latest',
         },
     )
-
+    const [viewProp, setViewProp] = useState('')
     const posthog = usePostHog()
-
     const [result, setResult] = useState<ExecutionResult>()
     const [messages, setMessages] = useState<Message[]>([])
-    const [ApiMessage,setApiMessages]= useState<Message[]>([])
-    const [fragment, setFragment] = useState<DeepPartial<FragmentSchema>>()
+    const [ApiMessage, setApiMessages] = useState<Message[]>([])
+    const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
     const [currentTab, setCurrentTab] = useState<'code' | 'fragment'>('code')
     const [isPreviewLoading, setIsPreviewLoading] = useState(false)
     const [isAuthDialogOpen, setAuthDialog] = useState(false)
@@ -67,7 +69,7 @@ export default function Home() {
             currentModel?.id === 'o1-preview' || currentModel?.id === 'o1-mini'
                 ? '/api/chat-o1'
                 : '/api/chat',
-        schema:artifactSchema,
+        schema: artifactSchema,
         onError: (error) => {
             if (error.message.includes('request limit')) {
                 setIsRateLimited(true)
@@ -75,37 +77,70 @@ export default function Home() {
         },
         onFinish: async ({ object: fragment, error }) => {
             if (!error) {
-                // send it to /api/sandbox
+
                 console.log('fragment', fragment)
-                // setIsPreviewLoading(true)
-                // posthog.capture('fragment_generated', {
-                //     template: fragment?.template,
-                // })
 
-                // const response = await fetch('/api/sandbox', {
-                //     method: 'POST',
-                //     body: JSON.stringify({
-                //         fragment,
-                //         userID: session?.user?.id,
-                //         apiKey,
-                //     }),
-                // })
+                if (fragment){
+                    addNewMessage(supabase, viewProp, 'assistant', fragment?.commentary || '', fragment?.title || '', fragment?.description || '', fragment?.code || '')
+                    setResult({ code: fragment.code })
+                }
+                   
 
-                // const result = await response.json()
-                // console.log('result', result)
-                // posthog.capture('sandbox_created', { url: result.url })
-
-                // setResult(result)
-                // setCurrentPreview({ fragment, result })
-                // setMessage({ result })
-                // setCurrentTab('fragment')
-                // setIsPreviewLoading(false)
             }
         },
     })
+    useEffect(() => {
 
+        if (typeof params.id === 'string') {
+            setViewProp(params.id);
+            getMessageList(supabase, params.id)
+                .then((messages) => {
+                    if (messages) {
+                        console.log(messages)
+                        const newMessages = messages.map((element, index) => {
+                            let message: Message
+                            if (element.role == 'assistant') {
+                                message = {
+                                    role: element.role,
+                                    content: [
+                                        { type: 'text', text: element.commentary || '' },
+                                        { type: 'code', text: element.code || '' },
+                                    ],
+                                    object: {
+                                        code: element.code,
+                                        commentary: element.commentary,
+                                        title: element.title,
+                                        description: element.description
+                                    },
+                                    result: { code: element.code }
+                                }
+                            }
+                            else {
+                                message = {
+                                    role: element.role,
+                                    content: [
+                                        { type: 'text', text: element.commentary || '' },
+                                        { type: 'code', text: element.code || '' },
+                                    ],
+                                }
+                            }
+
+                            return message
+                        })
+
+                        setApiMessages(newMessages)
+                        setMessages(newMessages)
+
+
+                    }
+
+                })
+
+        }
+    }, [])
     useEffect(() => {
         if (object) {
+            console.log(object)
             setFragment(object)
             const content: Message['content'] = [
                 { type: 'text', text: object.commentary || '' },
@@ -118,6 +153,11 @@ export default function Home() {
                     content,
                     object,
                 })
+                console.log("添加", JSON.stringify({
+                    role: 'assistant',
+                    content,
+                    object,
+                }))
             }
 
             if (lastMessage && lastMessage.role === 'assistant') {
@@ -125,45 +165,17 @@ export default function Home() {
                     content,
                     object,
                 })
+
             }
+
         }
     }, [object])
 
-    useEffect(()=>{
-        const prompt=create_prompt(byAI,name,price,pic,desc,spec,content,style,layout,interactive)
-        const contents: Message['content'] = [{ type: 'text', text: prompt }]
-        const updatedMessages:Message={
-            role: "user",
-            content:contents,
-        }
-        setApiMessages((previousMessages) => [...previousMessages, updatedMessages])
-        submit({
-            userID: session?.user?.id,
-            messages: toAISDKMessages([updatedMessages]),
-            template: currentTemplate,
-            model: currentModel,
-            config: languageModel,
-        })
-    },[])
+
     useEffect(() => {
         if (error) stop()
     }, [error])
-    if(!searchParams){
-        router.push('/web-generator'); 
-        return null
-    }
-   
-    // 将查询参数转换为所需的数据格式
-    const byAI=searchParams.get('byAI')|| '1';
-    const name=searchParams.get('name') || '';
-    const price=searchParams.get('price') || '';
-    const desc=searchParams.get('desc') || '';
-    const spec=searchParams.get('spec') || '';
-    const pic=searchParams.get('pic')|| '';
-    const content = searchParams.get('content')?.split(',') || [];
-    const style = searchParams.get('style') || '';
-    const layout = searchParams.get('layout') || '';
-    const interactive = searchParams.get('interactive')?.split(',') || [];
+
 
     function setMessage(message: Partial<Message>, index?: number) {
         setMessages((previousMessages) => {
@@ -218,6 +230,8 @@ export default function Home() {
             model: currentModel,
             config: languageModel,
         })
+        console.log(viewProp)
+        addNewMessage(supabase, viewProp, 'user', chatInput,  '',  '',  '')
 
         setChatInput('')
         setFiles([])
@@ -290,7 +304,7 @@ export default function Home() {
     }
 
     function setCurrentPreview(preview: {
-        fragment: DeepPartial<FragmentSchema> | undefined
+        fragment: DeepPartial<ArtifactSchema> | undefined
         result: ExecutionResult | undefined
     }) {
         setFragment(preview.fragment)
@@ -301,6 +315,29 @@ export default function Home() {
         setMessages((previousMessages) => [...previousMessages.slice(0, -2)])
         setApiMessages((previousMessages) => [...previousMessages.slice(0, -2)])
         setCurrentPreview({ fragment: undefined, result: undefined })
+    }
+    function GoToAccount() {
+        console.log('1')
+        window.open('/account', '_blank')
+    }
+    function setFirstMessage(queryParams: questionQuery) {
+        if (!session) {
+            return setAuthDialog(true)
+        }
+        const prompt = create_prompt(queryParams)
+        const contents: Message['content'] = [{ type: 'text', text: prompt }]
+        const updatedMessages: Message = {
+            role: "user",
+            content: contents,
+        }
+        setApiMessages((previousMessages) => [...previousMessages, updatedMessages])
+        submit({
+            userID: session?.user?.id,
+            messages: toAISDKMessages([updatedMessages]),
+            template: currentTemplate,
+            model: currentModel,
+            config: languageModel,
+        })
     }
 
     return (
@@ -322,33 +359,35 @@ export default function Home() {
                         showLogin={() => setAuthDialog(true)}
                         signOut={logout}
                         onSocialClick={handleSocialClick}
-                        onClear={handleClearChat}
-                        canClear={messages.length > 0}
-                        canUndo={messages.length > 1 && !isLoading}
-                        onUndo={handleUndo}
+                        onGoToAccount={GoToAccount}
                     />
-                    <Chat
-                        messages={messages}
-                        isLoading={isLoading}
-                        setCurrentPreview={setCurrentPreview}
-                    />
-                    <ChatInput
-                        retry={retry}
-                        isErrored={error !== undefined}
-                        isLoading={isLoading}
-                        isRateLimited={isRateLimited}
-                        stop={stop}
-                        input={chatInput}
-                        handleInputChange={handleSaveInputChange}
-                        handleSubmit={handleSubmitAuth}
-                        isMultiModal={currentModel?.multiModal || false}
-                        files={files}
-                        handleFileChange={handleFileChange}
-                    />
+
+                    <>
+                        <Chat
+                            messages={messages}
+                            isLoading={isLoading}
+                            setCurrentPreview={setCurrentPreview}
+                        />
+                        <ChatInput
+                            retry={retry}
+                            isErrored={error !== undefined}
+                            isLoading={isLoading}
+                            isRateLimited={isRateLimited}
+                            stop={stop}
+                            input={chatInput}
+                            handleInputChange={handleSaveInputChange}
+                            handleSubmit={handleSubmitAuth}
+                            isMultiModal={currentModel?.multiModal || false}
+                            files={files}
+                            handleFileChange={handleFileChange}
+                        />
+                    </>
+
+
 
                 </div>
                 <Preview
-                    apiKey={apiKey}
+                    // apiKey={apiKey}
                     selectedTab={currentTab}
                     onSelectedTabChange={setCurrentTab}
                     isChatLoading={isLoading}

@@ -36,20 +36,14 @@ export function NavBar({
   session,
   showLogin,
   signOut,
-  onClear,
-  canClear,
   onSocialClick,
-  onUndo,
-  canUndo,
+  onGoToAccount,
 }: {
   session: Session | null
   showLogin: () => void
   signOut: () => void
-  onClear: () => void
-  canClear: boolean
   onSocialClick: (target: 'github' | 'x' | 'discord') => void
-  onUndo: () => void
-  canUndo: boolean
+  onGoToAccount:() => void
 }) {
 
   return (
@@ -84,12 +78,12 @@ export function NavBar({
               </Tooltip>
             </TooltipProvider>
             <DropdownMenuContent className="w-56" align="end">
-              <DropdownMenuLabel className="flex flex-col">
+              <DropdownMenuItem  onClick={ ()=>{console.log("clicked");  onGoToAccount()}} className="flex flex-col">
                 <span className="text-sm">My Account</span>
                 <span className="text-xs text-muted-foreground">
                   {session.user.email}
                 </span>
-              </DropdownMenuLabel>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
              
               <DropdownMenuItem onClick={() => onSocialClick('github')}>

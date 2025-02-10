@@ -1,8 +1,9 @@
+import { Toaster } from '@/components/Toasts/toaster'
 import './globals.css'
 import { PostHogProvider, ThemeProvider } from './providers'
-import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,7 +29,9 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
-          <Toaster />
+          <Suspense>
+            <Toaster />
+          </Suspense>
         </body>
       </PostHogProvider>
     </html>

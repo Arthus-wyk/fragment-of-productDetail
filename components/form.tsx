@@ -7,6 +7,7 @@ import { ExpandableCheckboxContent } from './ui/expandableCheckbox';
 import Customer_reviews from './customer_reviews';
 import { Button } from './ui/button';
 import Basic_Form from './basic_form';
+import { questionQuery } from '@/lib/types';
 
 type Basic_Form = {
     name: string;
@@ -63,7 +64,11 @@ const product_interaction: OptionValue[] = [
     { content: '动态交互', value: 'dynamic_interaction' },
 ];
 const byAI = '由ai生成'
-export default function Form() {
+export default function Form({
+    setFirstMessage
+}: {
+    setFirstMessage: (queryParams:questionQuery) => void
+}) {
     const [formData, setFormData] = useState<FormData>({
         name: '',
         price: '',
@@ -144,33 +149,33 @@ export default function Form() {
         } else {
             setErrorMessage('');
             console.log(formData);  // 在这里可以处理表单提交的逻辑
-            let queryParams;
-            if(byAI){
-                queryParams = new URLSearchParams({
-                    byAI:'1',
-                    content: formData.content.join(','),
+            let queryParams:questionQuery;
+            if (byAI) {
+                queryParams ={
+                    byAI: '1',
+                    content: formData.content,
                     style: formData.style,
                     layout: formData.layout,
-                    interactive: formData.interactive.join(','),
-                }).toString();
+                    interactive: formData.interactive,
+                }
             }
-            else{
-                queryParams = new URLSearchParams({
-                    byAI:'0',
-                    name:formData.name,
-                    price:formData.price,
-                    pic:formData.pic.join(','),
-                    desc:formData.desc,
-                    spec:formData.spec,
-                    content: formData.content.join(','),
+            else {
+                queryParams = {
+                    byAI: '0',
+                    name: formData.name,
+                    price: formData.price,
+                    pic: formData.pic,
+                    desc: formData.desc,
+                    spec: formData.spec,
+                    content: formData.content,
                     style: formData.style,
                     layout: formData.layout,
-                    interactive: formData.interactive.join(','),
-                }).toString();
+                    interactive: formData.interactive,
+                }
             }
-
-            const url = `/web-generator/result/1?${queryParams}`
-            window.open(url, '_blank');
+            setFirstMessage(queryParams)
+            // const url = `/web-generator/result/1?${queryParams}`
+            // window.open(url, '_blank');
 
         }
     };

@@ -12,10 +12,21 @@ export type ExecutionResultInterpreter = ExecutionResultBase & {
   runtimeError?: ExecutionError
   cellResults: Result[]
 }
-
-export type ExecutionResultWeb = ExecutionResultBase & {
-  template: Exclude<TemplateId, 'code-interpreter-v1'>
-  url: string
+export type questionQuery={
+  byAI:'0'|'1'
+  name?:string
+  price?:string
+  pic?:string[]
+  desc?:string
+  spec?:string
+  content:string[]
+  style:string
+  layout:string
+  interactive:string[]
 }
 
-export type ExecutionResult = ExecutionResultInterpreter | ExecutionResultWeb
+export type ExecutionResultWeb = {
+  code: string
+}
+
+export type ExecutionResult = ExecutionResultWeb
