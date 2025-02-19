@@ -59,7 +59,7 @@ export default function GradientBackgroundPicker({
   };
 
   useEffect(() => {
-    console.log(colors)
+    console.log(result)
   }, [result])
 
   return (

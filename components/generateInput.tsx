@@ -28,7 +28,15 @@ import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-export default function GenerateInput({ r }: { r: any }) {
+export default function GenerateInput({
+  r,
+  setLoading,
+  setResult,
+}: {
+  r: any
+  setLoading: (isloading: boolean) => void
+  setResult: (result: ExecutionResult | undefined) => void
+}) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
@@ -42,7 +50,6 @@ export default function GenerateInput({ r }: { r: any }) {
   )
   const [viewProp, setViewProp] = useState('')
   const posthog = usePostHog()
-  const [result, setResult] = useState<ExecutionResult>()
   const [messages, setMessages] = useState<Message[]>([])
   const [ApiMessage, setApiMessages] = useState<Message[]>([])
   const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
@@ -86,6 +93,10 @@ export default function GenerateInput({ r }: { r: any }) {
       }
     },
   })
+
+  useEffect(() => {
+    setLoading(isLoading)
+  }, [isLoading])
 
   useEffect(() => {
     if (object) {
@@ -160,7 +171,6 @@ export default function GenerateInput({ r }: { r: any }) {
     const content: Message['content'] = [{ type: 'text', text: chatInput }]
     const images = files
 
-    
     if (images.length > 0) {
       images.forEach((image) => {
         content.push({ type: 'image', image })
@@ -202,17 +212,13 @@ export default function GenerateInput({ r }: { r: any }) {
 
   function addMessage(message: Message) {
     setMessages((previousMessages) => [...previousMessages, message])
-    if(messages.length==0){
-        setApiMessages((previousMessages) => [...previousMessages, r(message)])
-        return [...ApiMessage, r(message)]
+    if (messages.length == 0) {
+      setApiMessages((previousMessages) => [...previousMessages, r(message)])
+      return [...ApiMessage, r(message)]
+    } else {
+      setApiMessages((previousMessages) => [...previousMessages, message])
+      return [...ApiMessage, message]
     }
-    else{
-        setApiMessages((previousMessages) => [...previousMessages, message])
-        return [...ApiMessage, message]
-    }        
-    
-    
-    
   }
 
   function handleSaveInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -233,44 +239,28 @@ export default function GenerateInput({ r }: { r: any }) {
   }
 
   return (
-    <main className="flex min-h-screen max-h-screen">
-      <div className="grid w-full md:grid-cols-2">
-        <div
-          className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-1'}`}
-        >
-          <NavBar session={session} showLogin={() => setAuthDialog(true)} />
-          <GenerateProgress currentIndex={2} />
-          <>
-            <Chat
-              messages={messages}
-              isLoading={isLoading}
-              setCurrentPreview={setCurrentPreview}
-            />
-            <ChatInput
-              retry={retry}
-              isErrored={error !== undefined}
-              isLoading={isLoading}
-              isRateLimited={isRateLimited}
-              stop={stop}
-              input={chatInput}
-              handleInputChange={handleSaveInputChange}
-              handleSubmit={handleSubmitAuth}
-              files={files}
-              handleFileChange={handleFileChange}
-            />
-          </>
-        </div>
-        <Preview
-          // apiKey={apiKey}
-          selectedTab={currentTab}
-          onSelectedTabChange={setCurrentTab}
-          isChatLoading={isLoading}
-          isPreviewLoading={isPreviewLoading}
-          fragment={fragment}
-          result={result as ExecutionResult}
-          onClose={() => setFragment(undefined)}
+    <div>
+      <NavBar session={session} showLogin={() => setAuthDialog(true)} />
+      <GenerateProgress currentIndex={2} />
+      <>
+        <Chat
+          messages={messages}
+          isLoading={isLoading}
+          setCurrentPreview={setCurrentPreview}
         />
-      </div>
-    </main>
+        <ChatInput
+          retry={retry}
+          isErrored={error !== undefined}
+          isLoading={isLoading}
+          isRateLimited={isRateLimited}
+          stop={stop}
+          input={chatInput}
+          handleInputChange={handleSaveInputChange}
+          handleSubmit={handleSubmitAuth}
+          files={files}
+          handleFileChange={handleFileChange}
+        />
+      </>
+    </div>
   )
 }
