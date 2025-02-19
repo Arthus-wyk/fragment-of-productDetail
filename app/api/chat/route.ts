@@ -6,6 +6,7 @@ import { toPrompt } from '@/lib/prompt'
 import ratelimit from '@/lib/ratelimit'
 import { artifactSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { CoreMessage, LanguageModel, streamObject } from 'ai'
 
 
@@ -22,14 +23,10 @@ export async function POST(req: Request) {
   const {
     messages,
     userID,
-    template,
-    model,
     config,
   }: {
     messages: CoreMessage[]
     userID: string
-    template: Templates
-    model: LLMModel
     config: LLMModelConfig
   } = await req.json()
 
@@ -54,8 +51,9 @@ export async function POST(req: Request) {
 
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
-  const modelClient = getModelClient(model, config)
-  console.log("tem:",template)
+  const modelClient = createGoogleGenerativeAI({
+    apiKey:process.env.GOOGLE_GENERATIVE_AI_API_KEY
+   })('gemini-1.5-flash-latest')
 
 
   try{
@@ -66,7 +64,7 @@ export async function POST(req: Request) {
       schema,
       system: toPrompt(),
       messages,
-      mode: getDefaultMode(model),
+      mode: 'auto',
       ...modelParams,
       maxRetries:1
     })

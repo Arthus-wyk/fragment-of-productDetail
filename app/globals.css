@@ -66,4 +66,7 @@
   body {
     @apply bg-background text-foreground;
   }
+  input:not(.react-color input) {
+    @apply bg-white; /* 设置背景为白色 */
+  }
 }

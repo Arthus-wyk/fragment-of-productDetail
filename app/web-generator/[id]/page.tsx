@@ -22,6 +22,7 @@ import { supabase } from '@/lib/utils/supabase/client'
 import Form from '@/components/form'
 import { addNewChat, addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
 import { useRouter } from 'next/router'
+import GenerateProgress from '@/components/generateProgress'
 
 export default function WebGenerator({
     params
@@ -55,9 +56,7 @@ export default function WebGenerator({
     const [isRateLimited, setIsRateLimited] = useState(false)
     const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
 
-    const currentModel = modelsList.models.find(
-        (model) => model.id === languageModel.model,
-    )
+
     const currentTemplate =
         selectedTemplate === 'auto'
             ? templates
@@ -65,10 +64,7 @@ export default function WebGenerator({
     const lastMessage = messages[messages.length - 1]
 
     const { object, submit, isLoading, stop, error } = useObject({
-        api:
-            currentModel?.id === 'o1-preview' || currentModel?.id === 'o1-mini'
-                ? '/api/chat-o1'
-                : '/api/chat',
+        api: '/api/chat',
         schema: artifactSchema,
         onError: (error) => {
             if (error.message.includes('request limit')) {
@@ -90,7 +86,6 @@ export default function WebGenerator({
         },
     })
     useEffect(() => {
-
         if (typeof params.id === 'string') {
             setViewProp(params.id);
             getMessageList(supabase, params.id)
@@ -135,7 +130,6 @@ export default function WebGenerator({
                     }
 
                 })
-
         }
     }, [])
     useEffect(() => {
@@ -227,7 +221,6 @@ export default function WebGenerator({
             userID: session?.user?.id,
             messages: toAISDKMessages(updatedMessages),
             template: currentTemplate,
-            model: currentModel,
             config: languageModel,
         })
         console.log(viewProp)
@@ -248,7 +241,6 @@ export default function WebGenerator({
             userID: session?.user?.id,
             messages: toAISDKMessages(ApiMessage),
             template: currentTemplate,
-            model: currentModel,
             config: languageModel,
         })
     }
@@ -335,7 +327,6 @@ export default function WebGenerator({
             userID: session?.user?.id,
             messages: toAISDKMessages([updatedMessages]),
             template: currentTemplate,
-            model: currentModel,
             config: languageModel,
         })
     }
@@ -352,7 +343,7 @@ export default function WebGenerator({
             )}
             <div className="grid w-full md:grid-cols-2">
                 <div
-                    className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-2'}`}
+                    className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-1'}`}
                 >
                     <NavBar
                         session={session}
@@ -361,6 +352,7 @@ export default function WebGenerator({
                         onSocialClick={handleSocialClick}
                         onGoToAccount={GoToAccount}
                     />
+                    <GenerateProgress currentIndex={2}/>
 
                     <>
                         <Chat
@@ -377,7 +369,6 @@ export default function WebGenerator({
                             input={chatInput}
                             handleInputChange={handleSaveInputChange}
                             handleSubmit={handleSubmitAuth}
-                            isMultiModal={currentModel?.multiModal || false}
                             files={files}
                             handleFileChange={handleFileChange}
                         />

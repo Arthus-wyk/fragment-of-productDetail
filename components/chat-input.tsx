@@ -19,7 +19,6 @@ export function ChatInput({
   input,
   handleInputChange,
   handleSubmit,
-  isMultiModal,
   files,
   handleFileChange,
 }: {
@@ -31,7 +30,6 @@ export function ChatInput({
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-  isMultiModal: boolean
   files: string[]
   handleFileChange: (files: string[]) => void
 

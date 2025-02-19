@@ -14,6 +14,7 @@ import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { ChevronsRight, LoaderCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
+import GradientBackgroundPicker from './gradientBackgroundPicker'
 
 export function Preview({
   // apiKey,
@@ -34,9 +35,9 @@ export function Preview({
   result?: ExecutionResult
   onClose: () => void
 }) {
-  if (!fragment) {
-    return null
-  }
+  // if (!fragment) {
+  //   return null
+  // }
 
 
 
@@ -96,7 +97,8 @@ export function Preview({
           </div>
 
         </div>
-        {fragment && (
+        {/* <GradientBackgroundPicker/> */}
+        {/* {fragment && (
           <div className="overflow-y-auto w-full h-full">
             <TabsContent value="code" className="h-full">
               {fragment.code && fragment.title && (
@@ -114,7 +116,7 @@ export function Preview({
               {result && <FragmentPreview result={result as ExecutionResult} />}
             </TabsContent>
           </div>
-        )}
+        )} */}
       </Tabs>
     </div>
   )

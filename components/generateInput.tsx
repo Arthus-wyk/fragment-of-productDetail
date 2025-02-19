@@ -4,10 +4,11 @@ import { AuthDialog } from '@/components/auth-dialog'
 import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
 import Form from '@/components/form'
+import GenerateProgress from '@/components/generateProgress'
 import { NavBar } from '@/components/navbar'
 import { Preview } from '@/components/preview'
 import { AuthViewType, useAuth } from '@/lib/auth'
-import { backgroundPrompt, create_prompt } from '@/lib/create_prompt'
+import { create_prompt } from '@/lib/create_prompt'
 import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
 import { LLMModelConfig } from '@/lib/models'
 import modelsList from '@/lib/models.json'
@@ -22,12 +23,12 @@ import {
 } from '@/lib/utils/supabase/queries'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
-import { Button } from 'antd'
+import { useRouter } from 'next/router'
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-export default function WebGenerator({ params }: { params: { id: string } }) {
+export default function GenerateInput({ r }: { r: any }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
@@ -39,7 +40,7 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
       model: 'claude-3-5-sonnet-latest',
     },
   )
-
+  const [viewProp, setViewProp] = useState('')
   const posthog = usePostHog()
   const [result, setResult] = useState<ExecutionResult>()
   const [messages, setMessages] = useState<Message[]>([])
@@ -51,10 +52,7 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
   const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
-  let chat_id = ''
-  const currentModel = modelsList.models.find(
-    (model) => model.id === languageModel.model,
-  )
+
   const currentTemplate =
     selectedTemplate === 'auto'
       ? templates
@@ -73,13 +71,25 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
       if (!error) {
         console.log('fragment', fragment)
 
-        if (fragment) setResult({ code: fragment.code })
+        if (fragment) {
+          addNewMessage(
+            supabase,
+            viewProp,
+            'assistant',
+            fragment?.commentary || '',
+            fragment?.title || '',
+            fragment?.description || '',
+            fragment?.code || '',
+          )
+          setResult({ code: fragment.code })
+        }
       }
     },
   })
 
   useEffect(() => {
     if (object) {
+      console.log(object)
       setFragment(object)
       const content: Message['content'] = [
         { type: 'text', text: object.commentary || '' },
@@ -92,6 +102,14 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
           content,
           object,
         })
+        console.log(
+          '添加',
+          JSON.stringify({
+            role: 'assistant',
+            content,
+            object,
+          }),
+        )
       }
 
       if (lastMessage && lastMessage.role === 'assistant') {
@@ -99,54 +117,6 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
           content,
           object,
         })
-      }
-    }
-  }, [object])
-
-  useEffect(() => {
-    if (object?.title) {
-      if (chat_id == '') {
-        if (session) {
-          addNewChat(supabase, session?.user?.id, object.title).then(
-            (newChat) => {
-              if (newChat) {
-                chat_id = newChat[0].id
-                // 请求处理完后更新URL，但不刷新页面
-                const newUrl = `/web-generator/${newChat[0].id}` // 新的 URL
-                window.history.pushState(null, '', newUrl)
-                if (ApiMessage[0].content[0].type == 'text')
-                  addNewMessage(
-                    supabase,
-                    newChat[0].id,
-                    'user',
-                    ApiMessage[0].content[0].text,
-                    '',
-                    '',
-                    '',
-                  )
-                addNewMessage(
-                  supabase,
-                  newChat[0].id,
-                  'assistant',
-                  object.commentary || '',
-                  object.title || '',
-                  object.description || '',
-                  object.code || '',
-                )
-              }
-            },
-          )
-        }
-      } else {
-        addNewMessage(
-          supabase,
-          chat_id,
-          'assistant',
-          object.commentary || '',
-          object.title || '',
-          object.description || '',
-          object.code || '',
-        )
       }
     }
   }, [object])
@@ -190,6 +160,7 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
     const content: Message['content'] = [{ type: 'text', text: chatInput }]
     const images = files
 
+    
     if (images.length > 0) {
       images.forEach((image) => {
         content.push({ type: 'image', image })
@@ -205,10 +176,10 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
       userID: session?.user?.id,
       messages: toAISDKMessages(updatedMessages),
       template: currentTemplate,
-      model: currentModel,
       config: languageModel,
     })
-    addNewMessage(supabase, chat_id, 'user', chatInput, '', '', '')
+    console.log(viewProp)
+    addNewMessage(supabase, viewProp, 'user', chatInput, '', '', '')
 
     setChatInput('')
     setFiles([])
@@ -225,15 +196,23 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
       userID: session?.user?.id,
       messages: toAISDKMessages(ApiMessage),
       template: currentTemplate,
-      model: currentModel,
       config: languageModel,
     })
   }
 
   function addMessage(message: Message) {
     setMessages((previousMessages) => [...previousMessages, message])
-    setApiMessages((previousMessages) => [...previousMessages, message])
-    return [...ApiMessage, message]
+    if(messages.length==0){
+        setApiMessages((previousMessages) => [...previousMessages, r(message)])
+        return [...ApiMessage, r(message)]
+    }
+    else{
+        setApiMessages((previousMessages) => [...previousMessages, message])
+        return [...ApiMessage, message]
+    }        
+    
+    
+    
   }
 
   function handleSaveInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -245,24 +224,6 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
     setFiles(change)
   }
 
-  function logout() {
-    supabase
-      ? supabase.auth.signOut()
-      : console.warn('Supabase is not initialized')
-  }
-
-  function handleSocialClick(target: 'github' | 'x' | 'discord') {
-    if (target === 'github') {
-      window.open('https://github.com/e2b-dev/fragments', '_blank')
-    } else if (target === 'x') {
-      window.open('https://x.com/e2b_dev', '_blank')
-    } else if (target === 'discord') {
-      window.open('https://discord.gg/U7KEcGErtQ', '_blank')
-    }
-
-    posthog.capture(`${target}_click`)
-  }
-
   function setCurrentPreview(preview: {
     fragment: DeepPartial<ArtifactSchema> | undefined
     result: ExecutionResult | undefined
@@ -271,70 +232,33 @@ export default function WebGenerator({ params }: { params: { id: string } }) {
     setResult(preview.result)
   }
 
-  function GoToAccount() {
-    console.log('1')
-    window.open('/account', '_blank')
-  }
-  function setFirstMessage(queryParams: string) {
-    if (!session) {
-      return setAuthDialog(true)
-    }
-    const prompt = backgroundPrompt(queryParams)
-    const contents: Message['content'] = [{ type: 'text', text: prompt }]
-    const updatedMessages: Message = {
-      role: 'user',
-      content: contents,
-    }
-    setApiMessages((previousMessages) => [...previousMessages, updatedMessages])
-    submit({
-      userID: session?.user?.id,
-      messages: toAISDKMessages([updatedMessages]),
-      template: currentTemplate,
-      model: currentModel,
-      config: languageModel,
-    })
-  }
-
   return (
     <main className="flex min-h-screen max-h-screen">
-      {supabase && (
-        <AuthDialog
-          open={isAuthDialogOpen}
-          setOpen={setAuthDialog}
-          view={authView}
-          supabase={supabase}
-        />
-      )}
       <div className="grid w-full md:grid-cols-2">
         <div
-          className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-2}`}
+          className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-1'}`}
         >
-          <NavBar
-            session={session}
-            showLogin={() => setAuthDialog(true)}
-            signOut={logout}
-            onSocialClick={handleSocialClick}
-            onGoToAccount={GoToAccount}
-          />
-          <Button onClick={()=>setFirstMessage('我想要一个红蓝渐变的背景')}>测试</Button>
-
-          <Chat
-            messages={messages}
-            isLoading={isLoading}
-            setCurrentPreview={setCurrentPreview}
-          />
-          <ChatInput
-            retry={retry}
-            isErrored={error !== undefined}
-            isLoading={isLoading}
-            isRateLimited={isRateLimited}
-            stop={stop}
-            input={chatInput}
-            handleInputChange={handleSaveInputChange}
-            handleSubmit={handleSubmitAuth}
-            files={files}
-            handleFileChange={handleFileChange}
-          />
+          <NavBar session={session} showLogin={() => setAuthDialog(true)} />
+          <GenerateProgress currentIndex={2} />
+          <>
+            <Chat
+              messages={messages}
+              isLoading={isLoading}
+              setCurrentPreview={setCurrentPreview}
+            />
+            <ChatInput
+              retry={retry}
+              isErrored={error !== undefined}
+              isLoading={isLoading}
+              isRateLimited={isRateLimited}
+              stop={stop}
+              input={chatInput}
+              handleInputChange={handleSaveInputChange}
+              handleSubmit={handleSubmitAuth}
+              files={files}
+              handleFileChange={handleFileChange}
+            />
+          </>
         </div>
         <Preview
           // apiKey={apiKey}

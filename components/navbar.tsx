@@ -41,9 +41,9 @@ export function NavBar({
 }: {
   session: Session | null
   showLogin: () => void
-  signOut: () => void
-  onSocialClick: (target: 'github' | 'x' | 'discord') => void
-  onGoToAccount:() => void
+  signOut?: () => void
+  onSocialClick?: (target: 'github' | 'x' | 'discord') => void
+  onGoToAccount?:() => void
 }) {
 
   return (
@@ -55,7 +55,7 @@ export function NavBar({
         </Link>
         
       </div>
-      <div className="flex items-center gap-1 md:gap-4">
+      {/* <div className="flex items-center gap-1 md:gap-4">
    
         {session ? (
           <DropdownMenu>
@@ -103,7 +103,7 @@ export function NavBar({
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div>
+      </div> */}
     </nav>
   )
 }
