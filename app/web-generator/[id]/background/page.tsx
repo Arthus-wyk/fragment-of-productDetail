@@ -31,16 +31,22 @@ import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function WebGeneratorBackground() {
-  const [isChatLoading,setIsChatLoading]=useState(false)
-  const [result,setResult]=useState<ExecutionResult|undefined>()
+  const [isChatLoading, setIsChatLoading] = useState(false)
+  const [result, setResult] = useState<ExecutionResult | undefined>()
 
   return (
     <main className="flex min-h-screen max-h-screen">
       <div className="grid w-full md:grid-cols-2">
-        <div className="flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
-          <GenerateInput r={backgroundPrompt} setLoading={setIsChatLoading} setResult={setResult}/>
-        </div>
-        <GradientBackgroundPicker isChatLoading={isChatLoading} result={result}/>
+        <GenerateInput
+          r={backgroundPrompt}
+          setLoading={setIsChatLoading}
+          setResult={setResult}
+          progress={0}
+        />
+        <GradientBackgroundPicker
+          isChatLoading={isChatLoading}
+          result={result}
+        />
       </div>
     </main>
   )

@@ -32,10 +32,12 @@ export default function GenerateInput({
   r,
   setLoading,
   setResult,
+  progress,
 }: {
   r: any
   setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
+  progress: number
 }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
@@ -181,6 +183,7 @@ export default function GenerateInput({
       role: 'user',
       content,
     })
+    console.log('updatedMessages', updatedMessages)
 
     submit({
       userID: session?.user?.id,
@@ -213,7 +216,22 @@ export default function GenerateInput({
   function addMessage(message: Message) {
     setMessages((previousMessages) => [...previousMessages, message])
     if (messages.length == 0) {
-      setApiMessages((previousMessages) => [...previousMessages, r(message)])
+      const updatedMessages = {
+        role: message.role,
+        content: message.content.map((con) => {
+          if (con.type === 'code' || con.type === 'text' ) {
+            return {
+              type: con.type,
+              text: r(con.text),
+            }
+          }
+          return con
+        }),
+      }
+      setApiMessages((previousMessages) => [
+        ...previousMessages,
+        updatedMessages,
+      ])
       return [...ApiMessage, r(message)]
     } else {
       setApiMessages((previousMessages) => [...previousMessages, message])
@@ -239,9 +257,9 @@ export default function GenerateInput({
   }
 
   return (
-    <div>
+    <div className="flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
       <NavBar session={session} showLogin={() => setAuthDialog(true)} />
-      <GenerateProgress currentIndex={2} />
+      <GenerateProgress currentIndex={progress} />
       <>
         <Chat
           messages={messages}

@@ -63,6 +63,8 @@ export default function GradientBackgroundPicker({
   }, [result])
 
   return (
+    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y bg-popover h-full w-full overflow-auto">
+
     <div className="flex flex-col h-full w-full">
       <div className="flex flex-col items-center px-2 pt-1 justify-center">
       <h2>背景颜色选择器</h2>
@@ -163,6 +165,7 @@ export default function GradientBackgroundPicker({
           </Row>
         </div>
       </div>
+    </div>
     </div>
     </div>
   );
