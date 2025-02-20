@@ -56,7 +56,6 @@ export default function GenerateInput({
   const [ApiMessage, setApiMessages] = useState<Message[]>([])
   const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
   const [currentTab, setCurrentTab] = useState<'code' | 'fragment'>('code')
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
   const [isAuthDialogOpen, setAuthDialog] = useState(false)
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
@@ -232,7 +231,7 @@ export default function GenerateInput({
         ...previousMessages,
         updatedMessages,
       ])
-      return [...ApiMessage, r(message)]
+      return [...ApiMessage, updatedMessages]
     } else {
       setApiMessages((previousMessages) => [...previousMessages, message])
       return [...ApiMessage, message]

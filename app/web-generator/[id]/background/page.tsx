@@ -29,25 +29,15 @@ import { useRouter } from 'next/router'
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import { useTemplateContext } from '../template'
 
 export default function WebGeneratorBackground() {
-  const [isChatLoading, setIsChatLoading] = useState(false)
-  const [result, setResult] = useState<ExecutionResult | undefined>()
+  const { isChatLoading, result } = useTemplateContext();
 
   return (
-    <main className="flex min-h-screen max-h-screen">
-      <div className="grid w-full md:grid-cols-2">
-        <GenerateInput
-          r={backgroundPrompt}
-          setLoading={setIsChatLoading}
-          setResult={setResult}
-          progress={0}
-        />
         <GradientBackgroundPicker
           isChatLoading={isChatLoading}
           result={result}
         />
-      </div>
-    </main>
   )
 }
