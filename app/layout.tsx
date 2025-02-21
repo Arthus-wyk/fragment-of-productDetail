@@ -1,6 +1,8 @@
-import { Toaster } from '@/components/Toasts/toaster'
+
 import './globals.css'
-import { PostHogProvider, ThemeProvider } from './providers'
+import { QueryProvider,PostHogProvider, ThemeProvider } from './providers'
+import { Toaster } from '@/components/Toasts/toaster'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Suspense } from 'react'
@@ -17,18 +19,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: false,
+      },
+    },
+  })
   return (
     <html lang="en" suppressHydrationWarning>
       <PostHogProvider>
         <body className={inter.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </QueryProvider>
           <Suspense>
             <Toaster />
           </Suspense>

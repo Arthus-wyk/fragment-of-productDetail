@@ -1,43 +1,43 @@
 'use client'
 
-import { AuthDialog } from '@/components/auth-dialog'
-import { Chat } from '@/components/chat'
-import { ChatInput } from '@/components/chat-input'
-import Form from '@/components/form'
-import GenerateInput from '@/components/generateInput'
-import GenerateProgress from '@/components/generateProgress'
-import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
-import { NavBar } from '@/components/navbar'
-import { Preview } from '@/components/preview'
-import { AuthViewType, useAuth } from '@/lib/auth'
-import { backgroundPrompt, create_prompt } from '@/lib/create_prompt'
-import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
-import { LLMModelConfig } from '@/lib/models'
-import modelsList from '@/lib/models.json'
-import { artifactSchema, ArtifactSchema } from '@/lib/schema'
-import templates, { TemplateId } from '@/lib/templates'
-import { ExecutionResult, questionQuery } from '@/lib/types'
-import { supabase } from '@/lib/utils/supabase/client'
-import {
-  addNewChat,
-  addNewMessage,
-  getMessageList,
-} from '@/lib/utils/supabase/queries'
-import { DeepPartial } from 'ai'
-import { experimental_useObject as useObject } from 'ai/react'
-import { useRouter } from 'next/router'
-import { usePostHog } from 'posthog-js/react'
-import { useEffect, useState } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 import { useTemplateContext } from '../template'
+import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
+import { supabase } from '@/lib/utils/supabase/client'
+import { updateColor } from '@/lib/utils/supabase/queries'
+import { Button, Divider } from 'antd'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function WebGeneratorBackground() {
-  const { isChatLoading, result } = useTemplateContext();
-
+  const router = useRouter() // 用于编程式导航
+  const pathname = usePathname()
+  const {
+    isChatLoading,
+    result,
+    setBackgroundColor,
+    backgroundColor,
+    setResult,
+  } = useTemplateContext()
+  // 提取动态 ID
+  const basePath = pathname?.split('/').slice(0, -1).join('/')! // 获取 `/web-generator/:id`
+  const chat_id = basePath?.split('/').slice(-1)[0]
+  const handleNext = () => {
+    setResult(undefined)
+    if (backgroundColor) updateColor(supabase, chat_id, backgroundColor)
+    router.push(`${basePath}/layout`)
+  }
   return (
-        <GradientBackgroundPicker
-          isChatLoading={isChatLoading}
-          result={result}
-        />
+    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full overflow-auto">
+      <div className="w-full p-2">
+        <Button onClick={handleNext}>下一步</Button>
+      </div>
+      <Divider style={{ borderColor: '#ffffff' }}>
+        <h1 style={{ color: 'white', margin: 0 }}>背景展示</h1>
+      </Divider>
+      <GradientBackgroundPicker
+        isChatLoading={isChatLoading}
+        result={result}
+        setBackgroundColor={setBackgroundColor}
+      />
+    </div>
   )
 }

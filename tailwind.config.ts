@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      lineCliamp:{
+        3: '3',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -90,7 +93,7 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'),require('@tailwindcss/line-clamp'),],
 } satisfies Config
 
 export default config

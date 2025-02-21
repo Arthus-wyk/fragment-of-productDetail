@@ -79,3 +79,13 @@ export const addNewMessage = cache(async (supabase: SupabaseClient, chat_id: str
   }
 });
 
+export const updateColor = cache(async (supabase: SupabaseClient, chat_id: string, color:string) => {
+  let { error } = await supabase
+    .from('chat')
+    .update({backgroundColor:color})
+    .eq('id',chat_id)
+  if (error) {
+    console.log("更新背景颜色失败！", error)
+  }
+});
+

@@ -2,13 +2,12 @@
 import { Duration } from '@/lib/duration'
 import { getModelClient, getDefaultMode } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
-import { toPrompt } from '@/lib/prompt'
+import { backgroundPrompt, layoutPrompt, toPrompt } from '@/lib/prompt'
 import ratelimit from '@/lib/ratelimit'
 import { artifactSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { CoreMessage, LanguageModel, streamObject } from 'ai'
-
 
 export const maxDuration = 60
 
@@ -24,10 +23,14 @@ export async function POST(req: Request) {
     messages,
     userID,
     config,
+    step,
+    backgroundColor,
   }: {
     messages: CoreMessage[]
     userID: string
     config: LLMModelConfig
+    step:number
+    backgroundColor?:string
   } = await req.json()
 
   const limit = !config.apiKey
@@ -48,7 +51,11 @@ export async function POST(req: Request) {
       },
     })
   }
+  const prompt:{ [key: number]: string }={
+    0:backgroundPrompt,
+    1:layoutPrompt(backgroundColor),
 
+  }
 
   const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
   const modelClient = createGoogleGenerativeAI({
@@ -57,12 +64,12 @@ export async function POST(req: Request) {
 
 
   try{
-    console.log("系统提示词：",toPrompt())
+    console.log("系统提示词：",prompt[step])
     console.log("用户提示词：",messages)
     const stream = await streamObject({
       model: modelClient as LanguageModel,
       schema,
-      system: toPrompt(),
+      system: prompt[step],
       messages,
       mode: 'auto',
       ...modelParams,
@@ -77,9 +84,4 @@ export async function POST(req: Request) {
       status: 500,
     })
   }
-
-  // console.log('stream',stream)
-
-
-
 }

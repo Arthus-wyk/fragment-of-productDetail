@@ -31,21 +31,33 @@ import {
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 
 export function NavBar({
   session,
   showLogin,
   signOut,
-  onSocialClick,
-  onGoToAccount,
+
 }: {
   session: Session | null
   showLogin: () => void
   signOut?: () => void
-  onSocialClick?: (target: 'github' | 'x' | 'discord') => void
-  onGoToAccount?:() => void
-}) {
 
+}) {
+  const onSocialClick=(target: 'github' | 'x' | 'discord') =>{
+    if (target === 'github') {
+      window.open('https://github.com/Arthus-wyk/fragment-of-productDetail', '_blank')
+    }
+
+    posthog.capture(`${target}_click`)
+  }
+
+
+
+  const  onGoToAccount=() =>{
+    console.log('1')
+    window.open('/account', '_self')
+  }
   return (
     <nav className="flex h-14 p-4 bg-white sticky top-0 z-50  border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex flex-1 items-center">
@@ -55,7 +67,7 @@ export function NavBar({
         </Link>
         
       </div>
-      {/* <div className="flex items-center gap-1 md:gap-4">
+      <div className="flex items-center gap-1 md:gap-4">
    
         {session ? (
           <DropdownMenu>
@@ -103,7 +115,7 @@ export function NavBar({
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div> */}
+      </div>
     </nav>
   )
 }

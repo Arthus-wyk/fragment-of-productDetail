@@ -10,9 +10,9 @@ import { ExecutionResultWeb } from '@/lib/types'
 import { RotateCw } from 'lucide-react'
 import { useState } from 'react'
 
-export function FragmentWeb({ result }: { result: ExecutionResultWeb }) {
+export function FragmentWeb({ result }: { result: ExecutionResultWeb |undefined}) {
   const [iframeKey, setIframeKey] = useState(0)
-  const encodedHTML = encodeURIComponent(result.code);
+  const encodedHTML = encodeURIComponent(result? result.code:'' );
   const dataURI = `data:text/html;charset=utf-8,${encodedHTML}`;
   if (!result) return null
   console.log(result)

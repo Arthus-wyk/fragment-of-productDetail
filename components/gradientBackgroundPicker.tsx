@@ -8,9 +8,11 @@ import { ColorResult, SketchPicker } from 'react-color'
 export default function GradientBackgroundPicker({
   isChatLoading,
   result,
+  setBackgroundColor,
 }: {
   isChatLoading: boolean
   result?: ExecutionResult
+  setBackgroundColor:(color:string)=>void
 }) {
   const [colors, setColors] = useState(['#ffffff']) // 默认颜色数组
   const [gradientDirection, setGradientDirection] = useState('to right') // 渐变方向
@@ -59,6 +61,9 @@ export default function GradientBackgroundPicker({
     borderRadius: '4px',
     padding: '20px',
   }
+  useEffect(()=>{
+    setBackgroundColor(gradientStyle.background)
+  },[colors])
 
   useEffect(() => {
     console.log(result)
@@ -66,8 +71,7 @@ export default function GradientBackgroundPicker({
   }, [result])
 
   return (
-    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y bg-popover h-full w-full overflow-auto">
-      <div className="flex flex-col h-full w-full">
+      <div className="flex flex-col w-full">
         <div className="flex flex-col items-center px-2 pt-1 justify-center">
           <h2>背景颜色选择器</h2>
           <div style={{ marginBottom: '20px' }}>
@@ -173,7 +177,6 @@ export default function GradientBackgroundPicker({
               </Row>
             </div>
           </div>
-        </div>
       </div>
     </div>
   )

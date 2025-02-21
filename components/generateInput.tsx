@@ -33,11 +33,13 @@ export default function GenerateInput({
   setLoading,
   setResult,
   progress,
+  backgroundColor,
 }: {
   r: any
   setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
+  backgroundColor:string
 }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
@@ -60,7 +62,6 @@ export default function GenerateInput({
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
   const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
-
   const currentTemplate =
     selectedTemplate === 'auto'
       ? templates
@@ -189,6 +190,8 @@ export default function GenerateInput({
       messages: toAISDKMessages(updatedMessages),
       template: currentTemplate,
       config: languageModel,
+      step:progress,
+      backgroundColor
     })
     console.log(viewProp)
     addNewMessage(supabase, viewProp, 'user', chatInput, '', '', '')
@@ -209,34 +212,41 @@ export default function GenerateInput({
       messages: toAISDKMessages(ApiMessage),
       template: currentTemplate,
       config: languageModel,
+      step:progress,
+      backgroundColor
     })
   }
-
+  
   function addMessage(message: Message) {
     setMessages((previousMessages) => [...previousMessages, message])
-    if (messages.length == 0) {
-      const updatedMessages = {
-        role: message.role,
-        content: message.content.map((con) => {
-          if (con.type === 'code' || con.type === 'text' ) {
-            return {
-              type: con.type,
-              text: r(con.text),
-            }
-          }
-          return con
-        }),
-      }
-      setApiMessages((previousMessages) => [
-        ...previousMessages,
-        updatedMessages,
-      ])
-      return [...ApiMessage, updatedMessages]
-    } else {
-      setApiMessages((previousMessages) => [...previousMessages, message])
-      return [...ApiMessage, message]
-    }
+    return [...messages, message]
   }
+
+  // function addMessage(message: Message) {
+  //   setMessages((previousMessages) => [...previousMessages, message])
+  //   if (messages.length == 0) {
+  //     const updatedMessages = {
+  //       role: message.role,
+  //       content: message.content.map((con) => {
+  //         if (con.type === 'code' || con.type === 'text' ) {
+  //           return {
+  //             type: con.type,
+  //             text: r(con.text),
+  //           }
+  //         }
+  //         return con
+  //       }),
+  //     }
+  //     setApiMessages((previousMessages) => [
+  //       ...previousMessages,
+  //       updatedMessages,
+  //     ])
+  //     return [...ApiMessage, updatedMessages]
+  //   } else {
+  //     setApiMessages((previousMessages) => [...previousMessages, message])
+  //     return [...ApiMessage, message]
+  //   }
+  // }
 
   function handleSaveInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setChatInput(e.target.value)

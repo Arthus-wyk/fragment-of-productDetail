@@ -349,8 +349,7 @@ export default function WebGenerator({
                         session={session}
                         showLogin={() => setAuthDialog(true)}
                         signOut={logout}
-                        onSocialClick={handleSocialClick}
-                        onGoToAccount={GoToAccount}
+    
                     />
                     <GenerateProgress currentIndex={2}/>
 
