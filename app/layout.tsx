@@ -19,14 +19,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: false,
-      },
-    },
-  })
   return (
     <html lang="en" suppressHydrationWarning>
       <PostHogProvider>

@@ -1,16 +1,23 @@
 'use client'
+
 import { AuthViewType, useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/utils/supabase/client'
-import { getUserChatList } from '@/lib/utils/supabase/queries'
+import { addNewChat, getUserChatList } from '@/lib/utils/supabase/queries'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Button, Card } from 'antd'
-import Link from 'next/link'
+import { Button, Card, Form, Input, Modal, Spin, message } from 'antd'
+import { useForm } from 'antd/es/form/Form'
+import FormItem from 'antd/es/form/FormItem'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function WebGenerator() {
+  const [form] = Form.useForm()
+  const router = useRouter() // 用于编程式导航
   const [isAuthDialogOpen, setAuthDialog] = useState(false)
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const { session } = useAuth(setAuthDialog, setAuthView)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isComfirm,setIscomfirm]=useState(false)
   const {
     refetch,
     data,
@@ -21,10 +28,49 @@ export default function WebGenerator() {
       if (session) {
         const list = await getUserChatList(supabase, session.user.id)
         return list
+      } else {
+        setAuthDialog(true)
       }
       return []
     },
   })
+  const {mutate} = useMutation({
+    mutationKey: ['addNewChat'],
+    mutationFn:async (name:string) => {
+      return await addNewChat(supabase, session?.user.id!, name);
+    },
+    onSuccess: (data) => {
+      setIscomfirm(false)
+      if(data){
+        router.push(`web-generator/${data[0].id}/background`)
+      }
+      else{
+        message.error("创建新项目失败")
+      }
+    },
+    onError: (error) => {
+      message.error("创建新项目失败")
+      setIscomfirm(false)
+    },
+  
+
+  })
+  const handleNewChat = () => {
+    if (!session) {
+      setAuthDialog(true)
+    } else {
+      setIsModalOpen(true)
+    }
+  }
+  const handleOk = () => {
+    const name = form.getFieldValue('name')
+    setIscomfirm(true)
+    mutate(name)
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false)
+    setIscomfirm(false)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,28 +95,47 @@ export default function WebGenerator() {
         {/* 项目网格 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* 新增项目卡片 */}
-          <Button className="h-48 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 transition-colors flex items-center justify-center">
+          <Button
+            className="h-48 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 transition-colors flex items-center justify-center"
+            onClick={handleNewChat}
+          >
             <span className="text-gray-500 hover:text-gray-700">
               + 新建项目
             </span>
           </Button>
 
           {/* 已有项目卡片 */}
-          {data && data.map((project) => (
-            <Card
-              key={project.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6"
-            >
-              <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
-              <div className="flex items-center justify-between text-sm text-gray-500">
-                <span>创建时间</span>
-                <time>
-                  {new Date(project.created_at).toLocaleDateString('zh-CN')}
-                </time>
-              </div>
-            </Card>
-          ))}
+          {data &&
+            data.map((project) => (
+              <Card
+                key={project.id}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6"
+              >
+                <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <span>创建时间</span>
+                  <time>
+                    {new Date(project.created_at).toLocaleDateString('zh-CN')}
+                  </time>
+                </div>
+              </Card>
+            ))}
         </div>
+        <Modal
+          title="Basic Modal"
+          open={isModalOpen}
+          onCancel={handleCancel}
+          footer={<div>
+            <Button type='default' onClick={handleCancel}>取消</Button>
+            <Button onClick={handleOk} loading={isComfirm} type='primary'>确定</Button>
+          </div>}
+        >
+          <Form form={form}>
+            <FormItem label="name" required>
+              <Input />
+            </FormItem>
+          </Form>
+        </Modal>
       </main>
     </div>
   )

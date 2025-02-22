@@ -4,6 +4,8 @@
 import GenerateInput from '@/components/generateInput'
 import { backgroundPrompt } from '@/lib/create_prompt'
 import { ExecutionResult } from '@/lib/types'
+import { supabase } from '@/lib/utils/supabase/client'
+import { getColor } from '@/lib/utils/supabase/queries'
 import { usePathname, useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from 'react'
 
@@ -39,6 +41,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const [backgroundColor,setBackgroundColor]=useState('')
   const [progress,setProgress]=useState(0)
 
+  if(!pathname){
+    return null
+  }
   // 定义路由与编号的映射关系
   const routeMap:{ [key: string]: number } = {
     'background': 0,
@@ -46,10 +51,14 @@ export default function Template({ children }: { children: React.ReactNode }) {
     'dashboard': 2,
   };
   useEffect(()=>{
-    const path=pathname?.split('/').slice(-1)[0]
+    const path=pathname.split('/').slice(-1)[0]
     if(path){
       setProgress(routeMap[path])
     }
+    getColor(supabase,pathname.split('/').slice(-2)[0]).then((data)=>{
+      if(data)
+      setBackgroundColor(data[0].backgroundColor)
+    })
   },[pathname])
   
   return (
@@ -66,11 +75,12 @@ export default function Template({ children }: { children: React.ReactNode }) {
       <main className="flex min-h-screen max-h-screen">
         <div className="grid w-full md:grid-cols-2">
           <GenerateInput
-            r={backgroundPrompt}
+            result={result}
             setLoading={setIsChatLoading}
             setResult={setResult}
             progress={progress}
             backgroundColor={backgroundColor}
+          
           />
           {children}
         </div>

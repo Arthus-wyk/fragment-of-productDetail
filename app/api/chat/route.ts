@@ -25,12 +25,14 @@ export async function POST(req: Request) {
     config,
     step,
     backgroundColor,
+    result
   }: {
     messages: CoreMessage[]
     userID: string
     config: LLMModelConfig
     step:number
     backgroundColor?:string
+    result:any
   } = await req.json()
 
   const limit = !config.apiKey
@@ -53,7 +55,7 @@ export async function POST(req: Request) {
   }
   const prompt:{ [key: number]: string }={
     0:backgroundPrompt,
-    1:layoutPrompt(backgroundColor),
+    1:layoutPrompt(result),
 
   }
 

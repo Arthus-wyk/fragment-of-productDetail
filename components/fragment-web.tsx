@@ -1,4 +1,4 @@
-import { CopyButton } from './ui/copy-button'
+'use client'
 import { Button } from '@/components/ui/button'
 import {
   Tooltip,
@@ -8,26 +8,34 @@ import {
 } from '@/components/ui/tooltip'
 import { ExecutionResultWeb } from '@/lib/types'
 import { RotateCw } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function FragmentWeb({ result }: { result: ExecutionResultWeb |undefined}) {
   const [iframeKey, setIframeKey] = useState(0)
+  const [isLoading, setIsLoading] = useState(true); // 用于跟踪 iframe 的加载状态
   const encodedHTML = encodeURIComponent(result? result.code:'' );
   const dataURI = `data:text/html;charset=utf-8,${encodedHTML}`;
-  if (!result) return null
-  console.log(result)
-  function refreshIframe() {
+
+  const refreshIframe=() =>{
     setIframeKey((prevKey) => prevKey + 1)
   }
-
+  useEffect(() => {
+    refreshIframe();
+  }, [result]);
   return (
     <div className="flex flex-col w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <div className="text-gray-500">加载中...</div>
+        </div>
+      )}
       <iframe
         key={iframeKey}
         className="h-full w-full"
         sandbox="allow-forms allow-scripts allow-same-origin"
         loading="lazy"
         src={dataURI}
+        onLoad={() => setIsLoading(false)}
       />
       <div className="p-2 border-t">
         <div className="flex items-center bg-muted dark:bg-white/10 rounded-2xl">

@@ -89,3 +89,14 @@ export const updateColor = cache(async (supabase: SupabaseClient, chat_id: strin
   }
 });
 
+export const getColor = cache(async (supabase: SupabaseClient, chat_id: string) => {
+  let {data:chat ,error } = await supabase
+    .from('chat')
+    .select('backgroundColor')
+    .eq('id',chat_id)
+  if (error) {
+    console.log("更新背景颜色失败！", error)
+  }
+  return chat
+});
+

@@ -19,8 +19,10 @@ import { supabase } from '@/lib/utils/supabase/client'
 import {
   addNewChat,
   addNewMessage,
+  getColor,
   getMessageList,
 } from '@/lib/utils/supabase/queries'
+import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
 import { useRouter } from 'next/router'
@@ -29,13 +31,13 @@ import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function GenerateInput({
-  r,
+  result,
   setLoading,
   setResult,
   progress,
   backgroundColor,
 }: {
-  r: any
+  result: any
   setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
@@ -183,17 +185,15 @@ export default function GenerateInput({
       role: 'user',
       content,
     })
-    console.log('updatedMessages', updatedMessages)
-
     submit({
       userID: session?.user?.id,
       messages: toAISDKMessages(updatedMessages),
       template: currentTemplate,
       config: languageModel,
       step:progress,
-      backgroundColor
+      backgroundColor,
+      result:result.code
     })
-    console.log(viewProp)
     addNewMessage(supabase, viewProp, 'user', chatInput, '', '', '')
 
     setChatInput('')
@@ -213,7 +213,8 @@ export default function GenerateInput({
       template: currentTemplate,
       config: languageModel,
       step:progress,
-      backgroundColor
+      backgroundColor,
+      result:result.code
     })
   }
   
