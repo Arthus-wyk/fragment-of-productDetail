@@ -3,7 +3,7 @@
 import { AuthDialog } from '@/components/auth-dialog'
 import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
-import Form from '@/components/form'
+
 import GenerateProgress from '@/components/generateProgress'
 import { NavBar } from '@/components/navbar'
 import { Preview } from '@/components/preview'
@@ -12,6 +12,7 @@ import { create_prompt } from '@/lib/create_prompt'
 import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
 import { LLMModelConfig } from '@/lib/models'
 import modelsList from '@/lib/models.json'
+import { basePrompt } from '@/lib/prompt'
 import { artifactSchema, ArtifactSchema } from '@/lib/schema'
 import templates, { TemplateId } from '@/lib/templates'
 import { ExecutionResult, questionQuery } from '@/lib/types'
@@ -25,10 +26,13 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import CollapseForm from './collapseForm'
+import { Form } from 'antd'
 
 export default function GenerateInput({
   result,
@@ -36,28 +40,30 @@ export default function GenerateInput({
   setResult,
   progress,
   backgroundColor,
+  chat_id,
 }: {
   result: any
   setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
-  backgroundColor:string
+  backgroundColor: string
+  chat_id: string
 }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
     'auto',
   )
+  const [form] = Form.useForm();
   const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
     'languageModel',
     {
       model: 'claude-3-5-sonnet-latest',
     },
   )
-  const [viewProp, setViewProp] = useState('')
   const posthog = usePostHog()
   const [messages, setMessages] = useState<Message[]>([])
-  const [ApiMessage, setApiMessages] = useState<Message[]>([])
+  const [ApiMessage, setApiMessages] = useState<Message>()
   const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
   const [currentTab, setCurrentTab] = useState<'code' | 'fragment'>('code')
   const [isAuthDialogOpen, setAuthDialog] = useState(false)
@@ -81,11 +87,13 @@ export default function GenerateInput({
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
         console.log('fragment', fragment)
+        if (lastMessage.role == 'user' && lastMessage.content[0].type=='text')
+          await addNewMessage(supabase, chat_id, 'user', lastMessage.content[0].text, '', '', '')
 
         if (fragment) {
-          addNewMessage(
+          await addNewMessage(
             supabase,
-            viewProp,
+            chat_id,
             'assistant',
             fragment?.commentary || '',
             fragment?.title || '',
@@ -98,13 +106,40 @@ export default function GenerateInput({
     },
   })
 
+  const { data: messageData } = useQuery({
+    queryKey: ['getMessages'],
+    queryFn: async () => {
+      const messages = await getMessageList(supabase, chat_id)
+      return messages // 确保返回数据
+    },
+  })
+
+  //如果没有消息队列，则预制一条消息
+  useEffect(() => {
+    if (messageData && messageData.length == 0 && progress>0) {
+      console.log("add a message")
+      const firstMessage: Message = {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: basePrompt(result.code),
+          },
+        ],
+      }
+      addNewMessage(supabase,chat_id,'user',basePrompt(result.code),'','','')
+      setApiMessages(firstMessage)
+    }
+
+  }, [messageData])
+
   useEffect(() => {
     setLoading(isLoading)
   }, [isLoading])
 
+  //接收到模型的消息，加入消息队列
   useEffect(() => {
     if (object) {
-      console.log(object)
       setFragment(object)
       const content: Message['content'] = [
         { type: 'text', text: object.commentary || '' },
@@ -117,14 +152,6 @@ export default function GenerateInput({
           content,
           object,
         })
-        console.log(
-          '添加',
-          JSON.stringify({
-            role: 'assistant',
-            content,
-            object,
-          }),
-        )
       }
 
       if (lastMessage && lastMessage.role === 'assistant') {
@@ -142,15 +169,6 @@ export default function GenerateInput({
 
   function setMessage(message: Partial<Message>, index?: number) {
     setMessages((previousMessages) => {
-      const updatedMessages = [...previousMessages]
-      updatedMessages[index ?? previousMessages.length - 1] = {
-        ...previousMessages[index ?? previousMessages.length - 1],
-        ...message,
-      }
-
-      return updatedMessages
-    })
-    setApiMessages((previousMessages) => {
       const updatedMessages = [...previousMessages]
       updatedMessages[index ?? previousMessages.length - 1] = {
         ...previousMessages[index ?? previousMessages.length - 1],
@@ -181,73 +199,50 @@ export default function GenerateInput({
       })
     }
 
-    const updatedMessages = addMessage({
-      role: 'user',
-      content,
-    })
+    const updatedMessages = ApiMessage
+      ? [
+          ApiMessage,
+          ...addMessage({
+            role: 'user',
+            content,
+          }),
+        ]
+      : addMessage({
+          role: 'user',
+          content,
+        })
+
     submit({
       userID: session?.user?.id,
       messages: toAISDKMessages(updatedMessages),
       template: currentTemplate,
       config: languageModel,
-      step:progress,
+      step: progress,
       backgroundColor,
-      result:result.code
+      result: result.code,
     })
-    addNewMessage(supabase, viewProp, 'user', chatInput, '', '', '')
-
     setChatInput('')
     setFiles([])
-    setCurrentTab('code')
 
-    posthog.capture('chat_submit', {
-      template: selectedTemplate,
-      model: languageModel.model,
-    })
   }
 
   function retry() {
+    const sendMessage = ApiMessage ? [ApiMessage, ...messages] : messages
     submit({
       userID: session?.user?.id,
-      messages: toAISDKMessages(ApiMessage),
+      messages: toAISDKMessages(sendMessage),
       template: currentTemplate,
       config: languageModel,
-      step:progress,
+      step: progress,
       backgroundColor,
-      result:result.code
+      result: result.code,
     })
   }
-  
+
   function addMessage(message: Message) {
     setMessages((previousMessages) => [...previousMessages, message])
     return [...messages, message]
   }
-
-  // function addMessage(message: Message) {
-  //   setMessages((previousMessages) => [...previousMessages, message])
-  //   if (messages.length == 0) {
-  //     const updatedMessages = {
-  //       role: message.role,
-  //       content: message.content.map((con) => {
-  //         if (con.type === 'code' || con.type === 'text' ) {
-  //           return {
-  //             type: con.type,
-  //             text: r(con.text),
-  //           }
-  //         }
-  //         return con
-  //       }),
-  //     }
-  //     setApiMessages((previousMessages) => [
-  //       ...previousMessages,
-  //       updatedMessages,
-  //     ])
-  //     return [...ApiMessage, updatedMessages]
-  //   } else {
-  //     setApiMessages((previousMessages) => [...previousMessages, message])
-  //     return [...ApiMessage, message]
-  //   }
-  // }
 
   function handleSaveInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setChatInput(e.target.value)
@@ -276,6 +271,7 @@ export default function GenerateInput({
           isLoading={isLoading}
           setCurrentPreview={setCurrentPreview}
         />
+        <CollapseForm/>
         <ChatInput
           retry={retry}
           isErrored={error !== undefined}

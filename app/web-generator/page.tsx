@@ -1,5 +1,6 @@
 'use client'
 
+import { AuthDialog } from '@/components/auth-dialog'
 import { AuthViewType, useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/utils/supabase/client'
 import { addNewChat, getUserChatList } from '@/lib/utils/supabase/queries'
@@ -37,7 +38,7 @@ export default function WebGenerator() {
   const {mutate} = useMutation({
     mutationKey: ['addNewChat'],
     mutationFn:async (name:string) => {
-      return await addNewChat(supabase, session?.user.id!, name);
+      return await addNewChat(supabase, session?.user.id!, name,'background');
     },
     onSuccess: (data) => {
       setIscomfirm(false)
@@ -55,6 +56,9 @@ export default function WebGenerator() {
   
 
   })
+  const openChat=(id:string)=>{
+    router.push(`web-generator/${id}/background`)
+  }
   const handleNewChat = () => {
     if (!session) {
       setAuthDialog(true)
@@ -74,6 +78,14 @@ export default function WebGenerator() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {supabase && (
+              <AuthDialog
+                open={isAuthDialogOpen}
+                setOpen={setAuthDialog}
+                view={authView}
+                supabase={supabase}
+              />
+            )}
       {/* 导航栏 */}
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -97,7 +109,7 @@ export default function WebGenerator() {
           {/* 新增项目卡片 */}
           <Button
             className="h-48 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 transition-colors flex items-center justify-center"
-            onClick={handleNewChat}
+            onClick={()=>handleNewChat()}
           >
             <span className="text-gray-500 hover:text-gray-700">
               + 新建项目
@@ -110,6 +122,7 @@ export default function WebGenerator() {
               <Card
                 key={project.id}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6"
+                onClick={()=>openChat(project.id)}
               >
                 <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
                 <div className="flex items-center justify-between text-sm text-gray-500">

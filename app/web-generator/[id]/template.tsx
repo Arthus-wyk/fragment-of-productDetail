@@ -44,20 +44,25 @@ export default function Template({ children }: { children: React.ReactNode }) {
   if(!pathname){
     return null
   }
+  const chat_id=pathname.split('/').slice(-2)[0]
   // 定义路由与编号的映射关系
   const routeMap:{ [key: string]: number } = {
     'background': 0,
     'layout': 1,
-    'dashboard': 2,
+    'detail': 2,
+    'expand':3,
+    'finish':4
   };
   useEffect(()=>{
     const path=pathname.split('/').slice(-1)[0]
     if(path){
       setProgress(routeMap[path])
     }
-    getColor(supabase,pathname.split('/').slice(-2)[0]).then((data)=>{
-      if(data)
-      setBackgroundColor(data[0].backgroundColor)
+    getColor(supabase,chat_id).then((data)=>{
+      if(data){
+        setBackgroundColor(data[0].backgroundColor)
+        console.log(data[0].backgroundColor)
+      }
     })
   },[pathname])
   
@@ -80,6 +85,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
             setResult={setResult}
             progress={progress}
             backgroundColor={backgroundColor}
+            chat_id={chat_id}
           
           />
           {children}

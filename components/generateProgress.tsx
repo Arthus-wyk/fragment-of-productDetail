@@ -24,7 +24,7 @@ export default function GenerateProgress({
     },
     {
       name: '商品信息',
-      valueIndex: 'information',
+      valueIndex: 'detail',
       index: 2,
     },
     {
@@ -33,8 +33,8 @@ export default function GenerateProgress({
       index: 3,
     },
     {
-      name: '交互',
-      valueIndex: 'interactive ',
+      name: '完成',
+      valueIndex: 'finish',
       index: 4,
     },
   ]

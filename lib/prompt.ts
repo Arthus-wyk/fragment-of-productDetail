@@ -14,13 +14,19 @@ export const backgroundPrompt =`你是一个电商详情页代码生成器，任
 `
 
 export function layoutPrompt(code:string) {
-  return `
-  你必须使用以下模板：${code}
- 
+  return ` 
 ## 核心规则
 你可以根据用户的要求修改模板，但必须是在模板的基础上
 你修改的是模板的布局
+如果修改的是图片，不要使用ima标签，使用类似<div class="md:w-1/2 bg-gray-200 h-64 md:h-auto animate-pulse">
+        <!-- Image -->
+      </div>
+      的图片骨架屏
+
 你返回的结果页必须是一个html页面，是根据模板和用户的要求修改得到的
 这些要求你必须严格执行
   `
+}
+export function basePrompt(code:string){
+  return `你必须使用以下模板：${code}`
 }

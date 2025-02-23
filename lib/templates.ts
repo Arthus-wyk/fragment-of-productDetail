@@ -41,10 +41,10 @@ export const originalLayout=(backgroundColor:string|undefined) =>
   <title>经典左图右文布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
+<body style="${backgroundColor && 'background:'+backgroundColor};" class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
   <div class="container mx-auto p-4">
-    <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
-      <!-- 左侧图片骨架 -->
+    <div class="flex flex-col md:flex-row rounded-lg shadow-lg overflow-hidden">
+      <!-- 图片骨架 -->
       <div class="md:w-1/2 bg-gray-200 h-64 md:h-auto animate-pulse">
         <!-- Image -->
       </div>

@@ -54,11 +54,11 @@ export const getMessageList = cache(async (supabase: SupabaseClient, chat_id: st
 });
 
 //创建新对话
-export const addNewChat = cache(async (supabase: SupabaseClient, user_id: string, title: string) => {
+export const addNewChat = cache(async (supabase: SupabaseClient, user_id: string, title: string,progress:string) => {
   let { data: chat, error } = await supabase
     .from('chat')
     .insert([
-      { user_id, title },
+      { user_id, title ,progress},
     ])
     .select()
   if (error) {
@@ -82,10 +82,19 @@ export const addNewMessage = cache(async (supabase: SupabaseClient, chat_id: str
 export const updateColor = cache(async (supabase: SupabaseClient, chat_id: string, color:string) => {
   let { error } = await supabase
     .from('chat')
-    .update({backgroundColor:color})
+    .update({backgroundColor:color,progress:'layout'})
     .eq('id',chat_id)
   if (error) {
     console.log("更新背景颜色失败！", error)
+  }
+});
+export const updateCode = cache(async (supabase: SupabaseClient, chat_id: string, code:string,progress:string) => {
+  let { error } = await supabase
+    .from('chat')
+    .update({currentCode:code,progress})
+    .eq('id',chat_id)
+  if (error) {
+    console.log("更新代码失败", error)
   }
 });
 
