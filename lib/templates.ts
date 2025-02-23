@@ -32,8 +32,8 @@ export const htmlTemplate = (backgroundColor:string|undefined) => `
   </html>
 `;
 
-export const originalLayout=(backgroundColor:string|undefined) =>
- `<!DOCTYPE html>
+export const originalLayout = (backgroundColor: string | undefined) =>
+  `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -41,27 +41,30 @@ export const originalLayout=(backgroundColor:string|undefined) =>
   <title>经典左图右文布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="${backgroundColor && 'background:'+backgroundColor};" class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
-  <div class="container mx-auto p-4">
-    <div class="flex flex-col md:flex-row rounded-lg shadow-lg overflow-hidden">
-      <!-- 图片骨架 -->
-      <div class="md:w-1/2 bg-gray-200 h-64 md:h-auto animate-pulse">
-        <!-- Image -->
-      </div>
+<body style="${backgroundColor && 'background:' + backgroundColor};" class="min-h-screen flex items-center justify-center">
+  <div class="w-full h-screen flex items-center justify-center">
+    <div class="flex flex-col md:flex-row w-full h-full">
+  <!-- 图片骨架 -->
+  <div class="md:w-1/2 h-1/2 md:h-full flex items-center justify-center">
+    <!-- Image -->
+    <div class="w-3/4 h-1/3 bg-gray-300"></div> <!-- 模拟图片内容 -->
+  </div>
 
-      <!-- 右侧内容骨架 -->
-      <div class="p-6 md:w-1/2 space-y-4">
-        <div class="h-8 bg-gray-200 rounded animate-pulse"></div>
-        <div class="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-        <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-        <div class="h-12 bg-gray-200 rounded animate-pulse"></div>
-        <div class="h-10 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-      </div>
-    </div>
+  <!-- 右侧内容骨架 -->
+  <div class="p-6 md:w-1/2 h-1/2 md:h-full space-y-4 flex flex-col justify-center">
+    <div class="h-8 bg-gray-200 rounded animate-pulse"></div>
+    <div class="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+    <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+    <div class="h-12 bg-gray-200 rounded animate-pulse"></div>
+    <div class="h-10 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+  </div>
+</div>
+
   </div>
 </body>
 </html>
-`
+`;
+
 export const splitLayout=(backgroundColor:string|undefined) =>
 `<!DOCTYPE html>
 <html lang="en">

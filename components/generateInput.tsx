@@ -271,7 +271,6 @@ export default function GenerateInput({
           isLoading={isLoading}
           setCurrentPreview={setCurrentPreview}
         />
-        <CollapseForm/>
         <ChatInput
           retry={retry}
           isErrored={error !== undefined}

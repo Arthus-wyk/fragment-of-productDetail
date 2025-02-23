@@ -1,43 +1,83 @@
 'use client'
 
-import { useTemplateContext } from '../template'
+import WebGeneratorBackgroundPreview from './preview'
+import SidebarLayout from '@/components/SidebarLayout'
+import { FragmentPreview } from '@/components/fragment-preview'
+import GenerateInput from '@/components/generateInput'
 import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
+import { originalLayout } from '@/lib/templates'
+import { ExecutionResult } from '@/lib/types'
 import { supabase } from '@/lib/utils/supabase/client'
-import { updateColor } from '@/lib/utils/supabase/queries'
-import { Button, Divider } from 'antd'
-import { usePathname, useRouter } from 'next/navigation'
+import { updateCode, updateColor } from '@/lib/utils/supabase/queries'
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons'
+import { useMutation } from '@tanstack/react-query'
+import { Button, Layout, Menu, message } from 'antd'
+import Sider from 'antd/es/layout/Sider'
+import { Content, Header } from 'antd/es/layout/layout'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-export default function WebGeneratorBackground() {
+export default function Page() {
   const router = useRouter() // 用于编程式导航
+  const { id } = useParams() as { id: string }
   const pathname = usePathname()
-  const {
-    isChatLoading,
-    result,
-    setBackgroundColor,
-    backgroundColor,
-    setResult,
-  } = useTemplateContext()
-  // 提取动态 ID
   const basePath = pathname?.split('/').slice(0, -1).join('/')! // 获取 `/web-generator/:id`
-  const chat_id = basePath?.split('/').slice(-1)[0]
-  const handleNext = () => {
-    setResult(undefined)
-    if (backgroundColor) updateColor(supabase, chat_id, backgroundColor)
-    router.push(`${basePath}/layout`)
-  }
+  const [isChatLoading, setIsChatLoading] = useState(false)
+  const [result, setResult] = useState<ExecutionResult | undefined>()
+  const [backgroundColor, setBackgroundColor] = useState('')
+  const [progress, setProgress] = useState(0)
+  const {mutateAsync } = useMutation({
+    mutationKey: ['addNewChat'],
+    mutationFn:async () => {
+      if (result?.code){
+        await updateColor(supabase,id,result.code)
+      }
+    },
+    onSuccess: () => {
+      router.push(`${basePath}/detail`)
+    },
+    onError: () => {
+      message.error("请求失败，请稍后重试")
+    },
+  })
   return (
-    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full overflow-auto">
-      <div className="w-full p-2">
-        <Button onClick={handleNext}>下一步</Button>
+    <div className="flex min-h-screen max-h-screen">
+      <div className="grid w-full md:grid-cols-2">
+        <SidebarLayout
+          defaultContentKey="1" // 默认显示内容 1
+          header={
+            <div className="w-full p-2">
+              <Button onClick={()=>mutateAsync()}>下一步</Button>
+            </div>
+          }
+          contentMap={{
+            1: (
+              <GradientBackgroundPicker
+                isChatLoading={isChatLoading}
+                result={result}
+                setBackgroundColor={setBackgroundColor}
+              />
+            ),
+            2: (
+              <GenerateInput
+                result={result}
+                setLoading={setIsChatLoading}
+                setResult={setResult}
+                progress={progress}
+                backgroundColor={backgroundColor}
+                chat_id={id as string}
+              />
+            ),
+          }}
+        />
+        <FragmentPreview result={{ code: originalLayout(backgroundColor) }} />
       </div>
-      <Divider style={{ borderColor: '#ffffff' }}>
-        <h1 style={{ color: 'white', margin: 0 }}>背景展示</h1>
-      </Divider>
-      <GradientBackgroundPicker
-        isChatLoading={isChatLoading}
-        result={result}
-        setBackgroundColor={setBackgroundColor}
-      />
     </div>
   )
 }

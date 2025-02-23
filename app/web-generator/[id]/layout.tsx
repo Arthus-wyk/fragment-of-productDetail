@@ -17,7 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {/* <main className="flex min-h-screen max-h-screen">
+          <div className="grid w-full md:grid-cols-2"> */}
+            {children}
+            {/* </div>
+        </main> */}
+      </body>
     </html>
   )
 }

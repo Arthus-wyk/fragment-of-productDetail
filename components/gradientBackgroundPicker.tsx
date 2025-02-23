@@ -51,18 +51,11 @@ export default function GradientBackgroundPicker({
     setGradientDirection(direction)
   }
 
-  // 生成渐变样式
-  const gradientStyle = {
-    background:
-      colors.length === 1
-        ? colors[0] // 单色背景
-        : `linear-gradient(${gradientDirection}, ${colors.join(', ')})`, // 渐变背景
-    width: '100%',
-    borderRadius: '4px',
-    padding: '20px',
-  }
+
   useEffect(()=>{
-    setBackgroundColor(gradientStyle.background)
+    setBackgroundColor(colors.length === 1
+      ? colors[0] // 单色背景
+      : `linear-gradient(${gradientDirection}, ${colors.join(', ')})`)
   },[colors])
 
   useEffect(() => {
@@ -143,40 +136,7 @@ export default function GradientBackgroundPicker({
           </div>
 
           {/* 展示区域 */}
-          <div
-            style={{
-              width: '70%',
-              marginBottom: '20px',
-              padding: '20px',
-              borderRadius: '15px',
-              background: 'rgba(255, 255, 255, 0.2)', // 半透明背景
-              boxShadow:
-                '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06)', // 模拟浮雕效果
-              backdropFilter: 'blur(10px)', // 背景模糊
-              WebkitBackdropFilter: 'blur(10px)', // 兼容 Safari
-              border: '1px solid rgba(255, 255, 255, 0.3)', // 边框
-            }}
-          >
-            <h3>背景展示</h3>
-            <div style={gradientStyle}>
-              <Row gutter={[16, 16]}>
-                {/* 左侧商品图片 */}
-                <Skeleton.Image />
-                {/* 右侧商品信息 */}
-                <Col xs={36} md={12}>
-                  <Skeleton active paragraph={{ rows: 4 }} />
-                  {/* 模拟按钮 */}
-                  <div style={{ marginTop: '16px' }}>
-                    <Skeleton.Button
-                      active
-                      style={{ width: '150px', marginRight: '10px' }}
-                    />
-                    <Skeleton.Button active style={{ width: '150px' }} />
-                  </div>
-                </Col>
-              </Row>
-            </div>
-          </div>
+          
       </div>
     </div>
   )
