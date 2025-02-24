@@ -1,52 +1,37 @@
 'use client'
 
-import { AuthDialog } from '@/components/auth-dialog'
 import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
-
 import GenerateProgress from '@/components/generateProgress'
 import { NavBar } from '@/components/navbar'
 import { Preview } from '@/components/preview'
 import { AuthViewType, useAuth } from '@/lib/auth'
-import { create_prompt } from '@/lib/create_prompt'
 import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
-import { LLMModelConfig } from '@/lib/models'
-import modelsList from '@/lib/models.json'
 import { basePrompt } from '@/lib/prompt'
 import { artifactSchema, ArtifactSchema } from '@/lib/schema'
-import templates, { TemplateId } from '@/lib/templates'
+import { TemplateId } from '@/lib/templates'
 import { ExecutionResult, questionQuery } from '@/lib/types'
 import { supabase } from '@/lib/utils/supabase/client'
-import {
-  addNewChat,
-  addNewMessage,
-  getColor,
-  getMessageList,
-} from '@/lib/utils/supabase/queries'
+import { addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
 import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
-import { usePathname } from 'next/navigation'
-import { useRouter } from 'next/router'
+import { Form } from 'antd'
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
-import CollapseForm from './collapseForm'
-import { Form } from 'antd'
 
 export default function GenerateInput({
   result,
   setLoading,
   setResult,
   progress,
-  backgroundColor,
   chat_id,
 }: {
-  result: any
+  result: ExecutionResult | undefined
   setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
-  backgroundColor: string
   chat_id: string
 }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
@@ -54,28 +39,17 @@ export default function GenerateInput({
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
     'auto',
   )
-  const [form] = Form.useForm();
-  const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
-    'languageModel',
-    {
-      model: 'claude-3-5-sonnet-latest',
-    },
-  )
+  const [form] = Form.useForm()
+
   const posthog = usePostHog()
   const [messages, setMessages] = useState<Message[]>([])
-  const [ApiMessage, setApiMessages] = useState<Message>()
+  const [codeMessage, setCodeMessages] = useState<Message>()
   const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
-  const [currentTab, setCurrentTab] = useState<'code' | 'fragment'>('code')
   const [isAuthDialogOpen, setAuthDialog] = useState(false)
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
   const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
-  const currentTemplate =
-    selectedTemplate === 'auto'
-      ? templates
-      : { [selectedTemplate]: templates[selectedTemplate] }
   const lastMessage = messages[messages.length - 1]
-
   const { object, submit, isLoading, stop, error } = useObject({
     api: '/api/chat',
     schema: artifactSchema,
@@ -87,9 +61,6 @@ export default function GenerateInput({
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
         console.log('fragment', fragment)
-        if (lastMessage.role == 'user' && lastMessage.content[0].type=='text')
-          await addNewMessage(supabase, chat_id, 'user', lastMessage.content[0].text, '', '', '')
-
         if (fragment) {
           await addNewMessage(
             supabase,
@@ -114,24 +85,18 @@ export default function GenerateInput({
     },
   })
 
-  //如果没有消息队列，则预制一条消息
-  useEffect(() => {
-    if (messageData && messageData.length == 0 && progress>0) {
-      console.log("add a message")
-      const firstMessage: Message = {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: basePrompt(result.code),
-          },
-        ],
-      }
-      addNewMessage(supabase,chat_id,'user',basePrompt(result.code),'','','')
-      setApiMessages(firstMessage)
+  useEffect(()=>{
+    if(result){
+      setCodeMessages({
+        role:'user',
+        content:[{
+          type:'code',
+          text:result.code
+        }]
+      })
     }
+  },[result])
 
-  }, [messageData])
 
   useEffect(() => {
     setLoading(isLoading)
@@ -199,9 +164,9 @@ export default function GenerateInput({
       })
     }
 
-    const updatedMessages = ApiMessage
+    const updatedMessages = codeMessage
       ? [
-          ApiMessage,
+          codeMessage,
           ...addMessage({
             role: 'user',
             content,
@@ -213,29 +178,27 @@ export default function GenerateInput({
         })
 
     submit({
-      userID: session?.user?.id,
       messages: toAISDKMessages(updatedMessages),
-      template: currentTemplate,
-      config: languageModel,
       step: progress,
-      backgroundColor,
-      result: result.code,
     })
+    await addNewMessage(
+      supabase,
+      chat_id,
+      'user',
+      chatInput,
+      '',
+      '',
+      '',
+    )
     setChatInput('')
     setFiles([])
-
   }
 
   function retry() {
-    const sendMessage = ApiMessage ? [ApiMessage, ...messages] : messages
+    const sendMessage = codeMessage ? [codeMessage, ...messages] : messages
     submit({
-      userID: session?.user?.id,
       messages: toAISDKMessages(sendMessage),
-      template: currentTemplate,
-      config: languageModel,
       step: progress,
-      backgroundColor,
-      result: result.code,
     })
   }
 
@@ -271,7 +234,6 @@ export default function GenerateInput({
           isLoading={isLoading}
           setCurrentPreview={setCurrentPreview}
         />
-        <CollapseForm/>
         <ChatInput
           retry={retry}
           isErrored={error !== undefined}

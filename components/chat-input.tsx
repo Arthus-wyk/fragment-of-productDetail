@@ -53,7 +53,7 @@ export function ChatInput({
     <form
       onSubmit={handleSubmit}
       onKeyDown={onEnter}
-      className="mb-2 flex flex-col bg-background"
+      className="mb-2 flex flex-col bg-background mt-auto"
     >
       {isErrored && (
         <div
@@ -92,33 +92,12 @@ export function ChatInput({
           onChange={handleInputChange}
         />
         <div className="flex p-3 gap-2 items-center">
-          {/* <input
-            type="file"
-            id="multimodal"
-            name="multimodal"
-            accept="image/*"
-            multiple={true}
-            className="hidden"
-            onChange={handleFileInput}
-          /> */
-          <UploadQiNiu onFileContentRead={handleFileChange}/>}
+
           <div className="flex items-center flex-1 gap-2">
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  {/* <Button
-                    disabled={!isMultiModal || isErrored}
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="rounded-xl h-10 w-10"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      document.getElementById('multimodal')?.click()
-                    }}
-                  >
-                    <Paperclip className="h-5 w-5" />
-                  </Button> */}
+
 
                 </TooltipTrigger>
                 <TooltipContent>Add attachments</TooltipContent>

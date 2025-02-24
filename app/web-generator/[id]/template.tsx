@@ -84,7 +84,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
             setLoading={setIsChatLoading}
             setResult={setResult}
             progress={progress}
-            backgroundColor={backgroundColor}
             chat_id={chat_id}
           
           />

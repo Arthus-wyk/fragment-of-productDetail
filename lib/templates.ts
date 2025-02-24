@@ -41,7 +41,7 @@ export const originalLayout=(backgroundColor:string|undefined) =>
   <title>经典左图右文布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="${backgroundColor && 'background:'+backgroundColor};" class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
+<body style="${backgroundColor && 'background:'+backgroundColor};" class="min-h-screen flex items-center justify-center">
   <div class="container mx-auto p-4">
     <div class="flex flex-col md:flex-row rounded-lg shadow-lg overflow-hidden">
       <!-- 图片骨架 -->
@@ -71,7 +71,7 @@ export const splitLayout=(backgroundColor:string|undefined) =>
   <title>分屏布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
+<body style="${backgroundColor && 'background:'+backgroundColor};" class="min-h-screen flex items-center justify-center">
   <div class="container mx-auto p-4">
     <!-- 顶部大图 -->
     <div class="bg-gray-200 h-64 rounded-lg animate-pulse"></div>
@@ -105,7 +105,7 @@ export const verticalLayout=(backgroundColor:string|undefined) =>`<!DOCTYPE html
   <title>图片轮播布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="${backgroundColor && backgroundColor} min-h-screen flex items-center justify-center">
+<body style="${backgroundColor && 'background:'+backgroundColor};" class="min-h-screen flex items-center justify-center">
   <div class="container mx-auto p-4">
     <!-- 图片轮播骨架 -->
     <div class="bg-gray-200 h-64 rounded-lg animate-pulse"></div>
@@ -130,7 +130,7 @@ export const fullScreenLayout=(backgroundColor:string|undefined) =>`<!DOCTYPE ht
   <title>全屏布局</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="${backgroundColor && backgroundColor}">
+<body style="${backgroundColor && 'background:'+backgroundColor};">
   <div class="min-h-screen flex">
     <!-- 左侧图片区域 -->
     <div class="flex-1 bg-gray-200 animate-pulse"></div>

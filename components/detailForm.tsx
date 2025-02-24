@@ -1,5 +1,6 @@
 'use client'
 
+import UploadQiNiu from './uploadQiNiu'
 import { UploadOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -10,22 +11,18 @@ import {
   InputNumber,
   Upload,
 } from 'antd'
-interface CollapseFormProps {
-    form: any; // 父组件传递的 Form 实例
-    onFormChange: (changedValues: any, allValues: any) => void; // 父组件传递的回调函数
-  }
-export default function CollapseForm({ form, onFormChange }:CollapseFormProps) {
+
+export default function DetailForm({handleAISubmit}: {
+  handleAISubmit: (value: any) => void
+}) {
+  const [form] = Form.useForm()
   // 提交表单的处理逻辑
   const handleSubmit = (values: any) => {
     console.log('提交的表单数据:', values)
+    handleAISubmit(values)
     // 在这里处理表单数据，例如发送到后端
   }
 
-  // 上传图片的处理逻辑
-  const handleUpload = (info: { file: any }) => {
-    console.log('上传的图片:', info.file)
-    // 可以在这里处理上传的图片，例如存储到服务器
-  }
   const items: CollapseProps['items'] = [
     {
       key: '1',
@@ -46,15 +43,7 @@ export default function CollapseForm({ form, onFormChange }:CollapseFormProps) {
               getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
               rules={[{ required: true, message: '请上传商品图片' }]}
             >
-              <Upload
-                name="image"
-                listType="picture"
-                maxCount={1}
-                onChange={handleUpload}
-                beforeUpload={() => false} // 禁止自动上传
-              >
-                <Button icon={<UploadOutlined />}>点击上传图片</Button>
-              </Upload>
+              <UploadQiNiu />
             </Form.Item>
 
             {/* 商品名称 */}
@@ -112,18 +101,18 @@ export default function CollapseForm({ form, onFormChange }:CollapseFormProps) {
       ),
     },
   ]
-  
+
   return (
-    <div className='mt-auto'>
-    <Collapse
-      items={items}
-      style={{
-        bottom: '100%', // 控制展开方向向上
-        left: 0,
-        right: 0,
-        background: '#f5f5f5',
-      }}
-    ></Collapse>
+    <div className="mt-auto">
+      <Collapse
+        items={items}
+        style={{
+          bottom: '100%', // 控制展开方向向上
+          left: 0,
+          right: 0,
+          background: '#f5f5f5',
+        }}
+      ></Collapse>
     </div>
   )
 }

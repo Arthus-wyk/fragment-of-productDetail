@@ -2,7 +2,7 @@
 import { Duration } from '@/lib/duration'
 import { getModelClient, getDefaultMode } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
-import { backgroundPrompt, layoutPrompt, toPrompt } from '@/lib/prompt'
+import { backgroundPrompt, detailPrompt, layoutPrompt, toPrompt } from '@/lib/prompt'
 import ratelimit from '@/lib/ratelimit'
 import { artifactSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
@@ -21,45 +21,19 @@ const ratelimitWindow = process.env.RATE_LIMIT_WINDOW
 export async function POST(req: Request) {
   const {
     messages,
-    userID,
-    config,
     step,
-    backgroundColor,
-    result
   }: {
     messages: CoreMessage[]
-    userID: string
-    config: LLMModelConfig
     step:number
-    backgroundColor?:string
-    result:any
   } = await req.json()
 
-  const limit = !config.apiKey
-    ? await ratelimit(
-        userID,
-        rateLimitMaxRequests,
-        ratelimitWindow,
-      )
-    : false
-
-  if (limit) {
-    return new Response('You have reached your request limit for the day.', {
-      status: 429,
-      headers: {
-        'X-RateLimit-Limit': limit.amount.toString(),
-        'X-RateLimit-Remaining': limit.remaining.toString(),
-        'X-RateLimit-Reset': limit.reset.toString(),
-      },
-    })
-  }
   const prompt:{ [key: number]: string }={
     0:backgroundPrompt,
-    1:layoutPrompt(result),
+    1:layoutPrompt(),
+    2:detailPrompt()
 
   }
 
-  const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
   const modelClient = createGoogleGenerativeAI({
     apiKey:process.env.GOOGLE_GENERATIVE_AI_API_KEY
    })('gemini-1.5-flash-latest')
@@ -74,7 +48,6 @@ export async function POST(req: Request) {
       system: prompt[step],
       messages,
       mode: 'auto',
-      ...modelParams,
       maxRetries:1
     })
     return stream.toTextStreamResponse()

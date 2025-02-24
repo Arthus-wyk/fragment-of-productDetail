@@ -104,7 +104,18 @@ export const getColor = cache(async (supabase: SupabaseClient, chat_id: string) 
     .select('backgroundColor')
     .eq('id',chat_id)
   if (error) {
-    console.log("更新背景颜色失败！", error)
+    console.log("获取背景颜色失败！", error)
+  }
+  return chat
+});
+
+export const getCode = cache(async (supabase: SupabaseClient, chat_id: string) => {
+  let {data:chat ,error } = await supabase
+    .from('chat')
+    .select('currentCode')
+    .eq('id',chat_id)
+  if (error) {
+    console.log("获取代码失败！", error)
   }
   return chat
 });
