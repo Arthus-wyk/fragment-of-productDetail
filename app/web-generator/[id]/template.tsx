@@ -12,9 +12,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 // components/TemplateContext.tsx
 
 type TemplateContextType = {
-  isChatLoading: boolean
   result: ExecutionResult | undefined
-  setIsChatLoading: (loading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   backgroundColor:string|undefined
   setBackgroundColor:(color:string)=>void
@@ -36,7 +34,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() // 获取当前路径
   const router = useRouter() // 用于编程式导航
 
-  const [isChatLoading, setIsChatLoading] = useState(false)
   const [result, setResult] = useState<ExecutionResult | undefined>()
   const [backgroundColor,setBackgroundColor]=useState('')
   const [progress,setProgress]=useState(0)
@@ -69,9 +66,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <TemplateContext.Provider
       value={{
-        isChatLoading,
         result,
-        setIsChatLoading,
         setResult,
         setBackgroundColor,
         backgroundColor
@@ -81,7 +76,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
         <div className="grid w-full md:grid-cols-2">
           <GenerateInput
             result={result}
-            setLoading={setIsChatLoading}
             setResult={setResult}
             progress={progress}
             chat_id={chat_id}

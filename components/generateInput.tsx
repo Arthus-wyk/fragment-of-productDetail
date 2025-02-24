@@ -23,13 +23,11 @@ import { useLocalStorage } from 'usehooks-ts'
 
 export default function GenerateInput({
   result,
-  setLoading,
   setResult,
   progress,
   chat_id,
 }: {
   result: ExecutionResult | undefined
-  setLoading: (isloading: boolean) => void
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
   chat_id: string
@@ -98,9 +96,7 @@ export default function GenerateInput({
   },[result])
 
 
-  useEffect(() => {
-    setLoading(isLoading)
-  }, [isLoading])
+
 
   //接收到模型的消息，加入消息队列
   useEffect(() => {
