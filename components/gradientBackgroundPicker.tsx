@@ -6,11 +6,9 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { ColorResult, SketchPicker } from 'react-color'
 
 export default function GradientBackgroundPicker({
-  isChatLoading,
   result,
   setBackgroundColor,
 }: {
-  isChatLoading: boolean
   result?: ExecutionResult
   setBackgroundColor:(color:string)=>void
 }) {

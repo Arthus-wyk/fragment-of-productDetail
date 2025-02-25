@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { ExecutionResultWeb } from '@/lib/types'
+import { Spin } from 'antd'
 import { RotateCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -25,9 +26,9 @@ export function FragmentWeb({ result }: { result: ExecutionResultWeb |undefined}
   return (
     <div className="flex flex-col w-full h-full">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+        <Spin className="flex items-center justify-center w-full h-full">
           <div className="text-gray-500">加载中...</div>
-        </div>
+        </Spin>
       )}
       <iframe
         key={iframeKey}

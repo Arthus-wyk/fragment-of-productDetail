@@ -94,7 +94,6 @@ export default function WebGeneratorDetail() {
       }
     },
     onSuccess: (data) => {
-      setIsLoading(false)
       router.push(`${basePath}/finish`)
     },
     onError: (error) => {

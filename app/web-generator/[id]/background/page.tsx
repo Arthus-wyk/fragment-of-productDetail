@@ -34,7 +34,6 @@ export default function WebGeneratorBackground() {
       }
     },
     onSuccess: () => {
-      setIsLoading(false)
       router.push(`${basePath}/layout`)
     },
     onError: () => {

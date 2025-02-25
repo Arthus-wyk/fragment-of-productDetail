@@ -9,7 +9,7 @@ import { Button, Card, Form, Input, Modal, Skeleton, Spin, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import FormItem from 'antd/es/form/FormItem'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function WebGenerator() {
   const [form] = Form.useForm()
@@ -27,19 +27,24 @@ export default function WebGenerator() {
   } = useQuery({
     queryKey: ['getChatList'],
     queryFn: async () => {
-      const list = await getUserChatList(supabase, session?.user.id!)
-      setIsLoading(false)
-      return list
+      const res = await getUserChatList(supabase, session?.user.id!)
+      if(res.success){
+        setIsLoading(false)
+        return res.chat
+      }else{
+        message.error('获取对话列表失败')
+        return []
+      }
     },
     enabled: !!session,
   })
+
   const { mutate } = useMutation({
     mutationKey: ['addNewChat'],
     mutationFn: async (name: string) => {
       return await addNewChat(supabase, session?.user.id!, name, 'background')
     },
     onSuccess: (data) => {
-      setIscomfirm(false)
       if (data) {
         router.push(`web-generator/${data[0].id}/background`)
       } else {
@@ -163,7 +168,7 @@ export default function WebGenerator() {
           }
         >
           <Form form={form}>
-            <FormItem label="name" required>
+            <FormItem label="name" name="name" required>
               <Input />
             </FormItem>
           </Form>

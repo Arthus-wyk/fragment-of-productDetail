@@ -40,8 +40,9 @@ export const getUserChatList = cache(
       .eq('user_id', user_id)
     if (error) {
       console.log('用户的所有对话查询失败！', error)
+      return { success: false, chat }
     }
-    return chat
+    return { success: true, chat }
   },
 )
 

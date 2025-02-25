@@ -1,4 +1,5 @@
 import { htmlTemplate, Templates } from '@/lib/templates'
+import { Value } from '@radix-ui/react-select'
 
 export function toPrompt() {
   return `
@@ -55,6 +56,48 @@ resulting in both images moving together.
 export function basePrompt(code: string) {
   return `你必须使用以下模板：${code}`
 }
+const productStyle = (value: string) => {
+  switch (value) {
+    case '1':
+      return `- Simple Style: 
+                  The page should feature a clean and minimalist design with minimal elements to highlight the product.`
+    case '2':
+      return `- Modern Style: 
+                  The page should have a modern and stylish feel, focusing on clean design and intuitive user experience.`
+    case '3':
+      return `- Vintage Style: 
+                  The page should incorporate retro elements and design, using nostalgic color schemes and fonts. `
+    case '4':
+      return `- Cartoon Style: 
+                  The page should use cartoonish elements and vibrant colors, making it fun and friendly. `
+    case '5':
+      return `- Luxury Style: 
+                  The page should have a luxurious and refined design suitable for high-end products.`
+    default:
+      return null
+  }
+}
+const productLayout = (value: string) => {
+  switch (value) {
+    case '1':
+      return '-Single Page Scroll: The page should have a single scrolling layout, with all content displayed on one page, and users can view it by scrolling.'
+    case '2':
+      return '-Split Screen Layout: The page should have a split-screen layout, typically with the left side showing the product image and the right side showing details like the description, price, etc.'
+    case '3':
+      return '-Grid Layout: The page content should be arranged in a grid layout, usually used for the recommended product section, displaying products in rows and columns.'
+    case '4':
+      return '-Card Layout: The page should have a card-style layout, where each product is displayed as an individual card, typically including images, price, name, etc.'
+    default:
+      return null
+  }
+}
+export function layoutSubmitPrompt(value1: string, value2: string) {
+  return `你需要按照以下要求生成对应风格和布局的html代码，但禁止出现具体数据，所有数据都用Skeleton代替：风格：${productStyle(
+    value1,
+  )}
+  布局：${productLayout(value2)}
+  `
+}
 export function formPrompt(code: string, value: string) {
   return `你需要在以下模板的基础上添加修改：${code} 把用户数据${value}填入该模板， 你要做的是把数据替换骨架屏，
   并加入一些电商详情页必要的ui
@@ -64,6 +107,7 @@ export function formPrompt(code: string, value: string) {
 图片需要能够正确加载并显示，且轮播要适配任意数量的图片。
 不能修改模板的布局`
 }
+
 const model = (index: number) => {
   switch (index) {
     case 1:
