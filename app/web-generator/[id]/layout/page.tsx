@@ -1,19 +1,19 @@
 'use client'
 
 import { useTemplateContext } from '../template'
+import StyleSelect from './styleSelect'
 import { FragmentPreview } from '@/components/fragment-preview'
-import {
-  originalLayout,
-} from '@/lib/templates'
+import { Message, toAISDKMessages } from '@/lib/messages'
+import { layoutSubmitPrompt } from '@/lib/prompt'
+import { artifactSchema } from '@/lib/schema'
+import { originalLayout } from '@/lib/templates'
 import { supabase } from '@/lib/utils/supabase/client'
 import { updateCode } from '@/lib/utils/supabase/queries'
 import { useMutation } from '@tanstack/react-query'
-import { Button,Divider, message} from 'antd'
+import { experimental_useObject as useObject } from 'ai/react'
+import { Button, Divider, message } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 import { SetStateAction, useEffect, useState } from 'react'
-import { experimental_useObject as useObject } from 'ai/react'
-import { artifactSchema } from '@/lib/schema'
-import StyleSelect from './styleSelect'
 
 export default function WebGeneratorLayout() {
   const router = useRouter() // 用于编程式导航
@@ -39,6 +39,7 @@ export default function WebGeneratorLayout() {
       } else {
         message.error('An unexpected error has occurred.')
       }
+      stop()
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
@@ -47,7 +48,6 @@ export default function WebGeneratorLayout() {
       }
     },
   })
-
 
   useEffect(() => {
     setResult({ code: originalLayout(backgroundColor) })
@@ -75,10 +75,22 @@ export default function WebGeneratorLayout() {
       message.error('请求失败，请稍后重试')
     },
   })
-  const onSubmit=(style:string,layout:string)=>{
-    if(result){
-      
-    }
+  const onSubmit = (style: string, layout: string) => {
+    const content: Message['content'] = [
+      {
+        type: 'text',
+        text: layoutSubmitPrompt(backgroundColor, style, layout),
+      },
+    ]
+    submit({
+      messages: toAISDKMessages([
+        {
+          role: 'user',
+          content,
+        },
+      ] as Message[]),
+      step: 1,
+    })
   }
 
   return (
@@ -91,7 +103,7 @@ export default function WebGeneratorLayout() {
       <Divider style={{ borderColor: '#ffffff' }}>
         <h1 style={{ color: 'white', margin: 0 }}>布局</h1>
       </Divider>
-      <StyleSelect isLoading={isSubmitLoading} onSubmit={onSubmit}/>
+      <StyleSelect isLoading={isSubmitLoading} onSubmit={onSubmit} />
       <div className="flex-grow overflow-auto">
         <FragmentPreview result={result} />
       </div>

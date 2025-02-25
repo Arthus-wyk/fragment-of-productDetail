@@ -91,11 +91,15 @@ const productLayout = (value: string) => {
       return null
   }
 }
-export function layoutSubmitPrompt(value1: string, value2: string) {
-  return `你需要按照以下要求生成对应风格和布局的html代码，但禁止出现具体数据，所有数据都用Skeleton代替：风格：${productStyle(
+export function layoutSubmitPrompt(bg:string|undefined,value1: string, value2: string) {
+  return `你需要按照以下要求生成对应风格和布局的html代码，
+  但禁止出现具体数据，所有数据都用Skeleton骨架屏代替，图片也需要用骨架屏：
+  风格：${productStyle(
     value1,
   )}
   布局：${productLayout(value2)}
+  你可以参考此模版${htmlTemplate(bg)}
+  在不修改body的style的情况下满足风格和布局
   `
 }
 export function formPrompt(code: string, value: string) {
