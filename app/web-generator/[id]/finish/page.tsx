@@ -96,8 +96,8 @@ export default function WebGeneratorDetail() {
           icon={<SmileOutlined />}
           title="非常棒！你已经完成全部步骤！"
           extra={[
-            <Button onClick={() => setIsFinish(false)}>返回</Button>,
-            <Button type="primary" onClick={() => mutateAsync()}>
+            <Button key='back' onClick={() => setIsFinish(false)}>返回</Button>,
+            <Button key='goHome' type="primary" onClick={() => mutateAsync()}>
               回到主页
             </Button>,
           ]}

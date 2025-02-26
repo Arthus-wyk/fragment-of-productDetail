@@ -4,7 +4,7 @@ import { Button, Card, Col, Collapse, Row } from 'antd'
 import classNames from 'classnames'
 import { SetStateAction, useState } from 'react'
 
-export default function ({
+export default function StyleSelect({
   isLoading,
   onSubmit,
 }: {
