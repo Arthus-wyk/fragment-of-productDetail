@@ -34,7 +34,7 @@ export default function Hero() {
         </div>
         <img
           alt='main image'
-          src='https://image1.juramaia.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20250117163959.png'
+          src='https://image1.juramaia.com/zhanshi.png'
           className="mt-8 max-w-full md:max-w-5xl mx-auto rounded-md shadow-2xl border sm:mt-12 block dark:hidden"
         />
 

@@ -11,11 +11,13 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 // components/TemplateContext.tsx
 
+// components/TemplateContext.tsx
+
 type TemplateContextType = {
   result: ExecutionResult | undefined
   setResult: (result: ExecutionResult | undefined) => void
-  backgroundColor:string|undefined
-  setBackgroundColor:(color:string)=>void
+  backgroundColor: string | undefined
+  setBackgroundColor: (color: string) => void
 }
 
 const TemplateContext = createContext<TemplateContextType | undefined>(
@@ -35,41 +37,43 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const router = useRouter() // 用于编程式导航
 
   const [result, setResult] = useState<ExecutionResult | undefined>()
-  const [backgroundColor,setBackgroundColor]=useState('')
-  const [progress,setProgress]=useState(0)
+  const [backgroundColor, setBackgroundColor] = useState('')
+  const [progress, setProgress] = useState(0)
 
-  if(!pathname){
+  if (!pathname) {
     return null
   }
-  const chat_id=pathname.split('/').slice(-2)[0]
+  const chat_id = pathname.split('/').slice(-2)[0]
   // 定义路由与编号的映射关系
-  const routeMap:{ [key: string]: number } = {
-    'background': 0,
-    'layout': 1,
-    'detail': 2,
-    'expand':3,
-    'finish':4
-  };
-  useEffect(()=>{
-    const path=pathname.split('/').slice(-1)[0]
-    if(path){
+  const routeMap: { [key: string]: number } = {
+    background: 0,
+    layout: 1,
+    detail: 2,
+    expand: 3,
+    finish: 4,
+  }
+  useEffect(() => {
+    const path = pathname.split('/').slice(-1)[0]
+    if (path) {
       setProgress(routeMap[path])
     }
-    getColor(supabase,chat_id).then((data)=>{
-      if(data){
-        setBackgroundColor(data[0].backgroundColor)
-        console.log(data[0].backgroundColor)
-      }
-    })
-  },[pathname])
-  
+    if (routeMap[path] !== 0) {
+      getColor(supabase, chat_id).then((data) => {
+        if (data) {
+          setBackgroundColor(data[0].backgroundColor)
+          console.log(data[0].backgroundColor)
+        }
+      })
+    }
+  }, [pathname])
+
   return (
     <TemplateContext.Provider
       value={{
         result,
         setResult,
         setBackgroundColor,
-        backgroundColor
+        backgroundColor,
       }}
     >
       <main className="flex min-h-screen max-h-screen">
@@ -79,7 +83,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
             setResult={setResult}
             progress={progress}
             chat_id={chat_id}
-          
           />
           {children}
         </div>

@@ -36,7 +36,7 @@ export const getUserChatList = cache(
   async (supabase: SupabaseClient, user_id: string) => {
     let { data: chat, error } = await supabase
       .from('chat')
-      .select('id,created_at,title')
+      .select('id,created_at,title,progress')
       .eq('user_id', user_id)
     if (error) {
       console.log('用户的所有对话查询失败！', error)
@@ -56,8 +56,9 @@ export const getMessageList = cache(
       .order('created_at', { ascending: true }) // 按时间升序排列
     if (error) {
       console.log('对话内容的查询失败！', error)
+      return { success: false, message }
     }
-    return message
+    return { success: true, message }
   },
 )
 
@@ -75,8 +76,26 @@ export const addNewChat = cache(
       .select()
     if (error) {
       console.log('创建新对话失败！', error)
+      return { success: false, chat }
     }
-    return chat
+    return { success: true, chat }
+  },
+)
+
+export const deleteChat = cache(
+  async (
+    supabase: SupabaseClient,
+    chat_id:string
+  ) => {
+    let {error} = await supabase
+      .from('chat')
+      .delete()
+      .eq('id', chat_id)
+    if (error) {
+      console.log('删除项目失败！', error)
+      return { success: false, error }
+    }
+    return { success: true, error:null }
   },
 )
 

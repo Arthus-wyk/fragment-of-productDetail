@@ -22,6 +22,7 @@ export default function WebGeneratorBackground() {
     mutationKey: ['addNewChat'],
     mutationFn: async () => {
       setIsLoading(true)
+      console.log(backgroundColor)
       if (backgroundColor) {
         const res = await updateColor(supabase, chat_id, backgroundColor)
         if (!res.success) {

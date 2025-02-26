@@ -111,6 +111,6 @@ export async function POST(req: Request) {
       sbxId: sbx?.sandboxId,
       template: fragment.template,
       url: `https://${sbx?.getHost(fragment.port || 3000)}`,
-    } as ExecutionResultWeb),
+    } as unknown as ExecutionResultWeb),
   )
 }

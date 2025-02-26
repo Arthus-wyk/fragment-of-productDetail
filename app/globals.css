@@ -48,5 +48,19 @@
   .ant-collapse {
     border: rgb(158, 157, 157);
   }
-
+  .ant-spin-nested-loading {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .ant-spin-container {
+    height: 100% !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* 修复 flex 容器高度塌陷 */
+  }
+  
+  .ant-spin-blur {
+    overflow: visible !important; /* 解除默认 overflow 限制 */
+  }
 }

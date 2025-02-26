@@ -78,8 +78,14 @@ export default function GenerateInput({
   const { data: messageData } = useQuery({
     queryKey: ['getMessages'],
     queryFn: async () => {
-      const messages = await getMessageList(supabase, chat_id)
-      return messages // 确保返回数据
+      const res = await getMessageList(supabase, chat_id)
+      if(res.success){
+        return messages // 确保返回数据
+      }
+      else{
+        return []
+      }
+      
     },
   })
 
