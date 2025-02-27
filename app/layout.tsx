@@ -23,6 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <PostHogProvider>
         <body className={inter.className}>
+        <SpeedInsights />
           <QueryProvider>
             <ThemeProvider
               attribute="class"
