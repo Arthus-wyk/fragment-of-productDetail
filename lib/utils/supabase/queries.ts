@@ -173,7 +173,8 @@ export const getCode = cache(
       .eq('id', chat_id)
     if (error) {
       console.log('获取代码失败！', error)
+      return{success:false,chat}
     }
-    return chat
+    return{success:true,chat}
   },
 )

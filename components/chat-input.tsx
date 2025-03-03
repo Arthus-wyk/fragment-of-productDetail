@@ -53,7 +53,7 @@ export function ChatInput({
     <form
       onSubmit={handleSubmit}
       onKeyDown={onEnter}
-      className="mb-2 flex flex-col bg-background mt-auto"
+      className="mb-2 flex flex-col mt-auto"
     >
       {isErrored && (
         <div
@@ -84,7 +84,7 @@ export function ChatInput({
           autoFocus={true}
           minRows={1}
           maxRows={5}
-          className="text-normal px-3 resize-none ring-0 bg-inherit w-full m-0 outline-none"
+          className="text-normal p-3 resize-none ring-0 bg-inherit w-full m-0 outline-none "
           required={true}
           placeholder="Describe your app..."
           disabled={isErrored}
@@ -146,12 +146,6 @@ export function ChatInput({
           </div>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground mt-2 text-center">
-        Fragments is an open-source project made by{' '}
-        <a href="https://e2b.dev" target="_blank" className="text-[#ff8800]">
-          ✶ E2B
-        </a>
-      </p>
     </form>
   )
 }

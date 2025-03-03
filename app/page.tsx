@@ -19,6 +19,14 @@ export default function Home() {
       ? supabase.auth.signOut()
       : console.warn('Supabase is not initialized')
   }
+  const goStart=()=>{
+    if(session){
+      window.location.href ="/web-generator";
+    }
+    else{
+      setAuthDialog(true)
+    }
+  }
 
   return (
     <main className=" min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-600">
@@ -37,7 +45,7 @@ export default function Home() {
         showLogin={() => setAuthDialog(true)}
         signOut={logout}
       />
-      <Hero />
+      <Hero goStart={goStart}/>
 
 
 

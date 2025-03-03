@@ -1,8 +1,6 @@
-// import { BGShapeCircle } from "@/components/bg-shape-circle";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Button } from "antd";
 
-export default function Hero() {
+export default function Hero({goStart}:{goStart:()=>void}) {
 
   return (
     <div className=" relative">
@@ -20,23 +18,16 @@ export default function Hero() {
           </p>
           <div className="flex flex-row justify-center gap-4">
 
-            <Link key='start' href='/web-generator' target="_blank">
-              <Button
+              <button
+              className="bg-gradient-to-r from-pink-600 to-blue-500 border-none hover:bg-gradient-to-r hover:from-pink-400 hover:to-blue-400 text-white font-bold py-2 px-4 rounded"
                 key='start'
-                size="lg"
-                variant="default"
+                onClick={goStart}
               >
                 Start Now!
-              </Button>
-            </Link>
+              </button>
           </div>
 
         </div>
-        <img
-          alt='main image'
-          src='https://image1.juramaia.com/zhanshi.png'
-          className="mt-8 max-w-full md:max-w-5xl mx-auto rounded-md shadow-2xl border sm:mt-12 block dark:hidden"
-        />
 
       </div>
     </div>

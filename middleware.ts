@@ -1,22 +1,29 @@
-import { kv } from '@vercel/kv'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    const id = req.nextUrl.pathname.split('/').pop()
-    const url = await kv.get(`fragment:${id}`)
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient(
+    { req, res },
+    {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_KEY,
+    },
+  )
 
-    if (url) {
-      return NextResponse.redirect(url as string)
-    } else {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  console.log(user)
+  // 如果用户未登录，重定向到根路由
+  if (!user) {
+    const loginUrl = new URL('/', req.url)
+    return NextResponse.redirect(loginUrl)
   }
-
-  return NextResponse.redirect(new URL('/', req.url))
 }
 
 export const config = {
-  matcher: '/s/:path*',
+  matcher: '/web-generator/:path*',
 }

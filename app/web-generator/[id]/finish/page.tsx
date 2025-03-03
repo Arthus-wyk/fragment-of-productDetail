@@ -1,6 +1,6 @@
 'use client'
 
-import { useTemplateContext } from '../template'
+
 import DetailForm from '@/components/detailForm'
 import { FragmentPreview } from '@/components/fragment-preview'
 import { Message, toAISDKMessages } from '@/lib/messages'
@@ -32,6 +32,7 @@ import {
 } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useTemplateContext } from '../template'
 
 export default function WebGeneratorDetail() {
   const router = useRouter() // 用于编程式导航
@@ -44,9 +45,13 @@ export default function WebGeneratorDetail() {
   const { result, setResult, backgroundColor } = useTemplateContext()
 
   const getCodeData = async () => {
-    const code = await getCode(supabase, chat_id)
-    if (code) setResult({ code: code[0].currentCode })
-    else message.error('获取代码失败！请刷新重试')
+    const res = await getCode(supabase, chat_id)
+    if(!res.success){
+      message.error('获取代码失败！请刷新重试')
+    }
+    else if (res.chat){
+      setResult({ code: res.chat[0].currentCode })
+    }
   }
 
   useEffect(() => {
@@ -79,7 +84,10 @@ export default function WebGeneratorDetail() {
     },
   })
   return (
-    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto">
+    <div
+      key={pathname}
+      className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto"
+    >
       <div className="w-full p-2">
         <Button onClick={() => setIsFinish(true)} loading={isLoading}>
           完成
@@ -96,8 +104,10 @@ export default function WebGeneratorDetail() {
           icon={<SmileOutlined />}
           title="非常棒！你已经完成全部步骤！"
           extra={[
-            <Button key='back' onClick={() => setIsFinish(false)}>返回</Button>,
-            <Button key='goHome' type="primary" onClick={() => mutateAsync()}>
+            <Button key="back" onClick={() => setIsFinish(false)}>
+              返回
+            </Button>,
+            <Button key="goHome" type="primary" onClick={() => mutateAsync()}>
               回到主页
             </Button>,
           ]}

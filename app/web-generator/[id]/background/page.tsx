@@ -1,6 +1,5 @@
 'use client'
 
-import { useTemplateContext } from '../template'
 import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
 import { supabase } from '@/lib/utils/supabase/client'
 import { updateColor } from '@/lib/utils/supabase/queries'
@@ -9,6 +8,7 @@ import { Button, Divider, message } from 'antd'
 import { error } from 'console'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useTemplateContext } from '../template'
 
 export default function WebGeneratorBackground() {
   const router = useRouter() // 用于编程式导航
@@ -29,9 +29,8 @@ export default function WebGeneratorBackground() {
           message.error('颜色更新失败：' + res.error)
           setIsLoading(false)
         }
-      }
-      else{
-        throw new Error('背景颜色未定义');
+      } else {
+        throw new Error('背景颜色未定义')
       }
     },
     onSuccess: () => {
@@ -44,7 +43,10 @@ export default function WebGeneratorBackground() {
   })
 
   return (
-    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full overflow-auto">
+    <div
+      key={pathname}
+      className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full overflow-auto"
+    >
       <div className="w-full p-2">
         <Button onClick={() => mutateAsync()} loading={isLoading}>
           下一步

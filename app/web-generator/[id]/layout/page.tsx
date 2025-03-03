@@ -1,6 +1,6 @@
 'use client'
 
-import { useTemplateContext } from '../template'
+
 import StyleSelect from './styleSelect'
 import { FragmentPreview } from '@/components/fragment-preview'
 import { Message, toAISDKMessages } from '@/lib/messages'
@@ -14,6 +14,7 @@ import { experimental_useObject as useObject } from 'ai/react'
 import { Button, Divider, message } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 import { SetStateAction, useEffect, useState } from 'react'
+import { useTemplateContext } from '../template'
 
 export default function WebGeneratorLayout() {
   const router = useRouter() // 用于编程式导航
@@ -94,7 +95,10 @@ export default function WebGeneratorLayout() {
   }
 
   return (
-    <div className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto">
+    <div
+      key={pathname}
+      className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto"
+    >
       <div className="w-full p-2">
         <Button onClick={() => mutateAsync()} loading={isLoading}>
           下一步
