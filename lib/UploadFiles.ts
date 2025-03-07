@@ -19,7 +19,7 @@ export const UploadFiles = async (file: RcFile) => {
             formData.append('key', file.name);
             });
             
-            const response = await fetch('https://up-cn-east-2.qiniup.com', {
+            const response = await fetch('https://upload-as0.qiniup.com', {
                 method: 'POST',
                 body: formData,
             });
@@ -27,7 +27,7 @@ export const UploadFiles = async (file: RcFile) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('key:' + data.key);
-                url = 'https://image1.juramaia.com/' + data.key;
+                url = 'https://fopme.xyz/' + data.key;
             } else {
                 console.log('Upload failed');
             }

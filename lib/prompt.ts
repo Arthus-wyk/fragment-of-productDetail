@@ -378,7 +378,7 @@ const model = (index: number) => {
               - Each recommended product card includes:
                   - **Product Name**: Randomly generate a realistic and relevant product name based on the product type. Ensure the name is concise and descriptive, e.g., "Wireless Bluetooth Headphones" or "4K Ultra HD Smart TV".
                   - **Price**: Randomly generate a reasonable price between $10 and $1000. Display the price as a numerical value with a dollar sign, e.g., "$199.99".
-                  - **Image**: Display a product image using the URL: "https://image1.juramaia.com/icon.png.webp".
+                  - **Image**: Display a product image using the URL: "https://fopme.xyz/catoon_cat.png".
                   - **Ratings and Reviews**: Add a section for star ratings (e.g., out of 5 stars) and a brief review count (e.g., "123 reviews").
               - Card Design: Each product card should have the following:
                   - **Background**: A clean, white or light gray background with a subtle shadow for depth.
