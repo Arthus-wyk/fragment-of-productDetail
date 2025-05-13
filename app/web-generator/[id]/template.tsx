@@ -21,7 +21,7 @@ type TemplateContextType = {
 }
 
 const TemplateContext = createContext<TemplateContextType | undefined>(
-  undefined,
+  undefined
 )
 
 export const useTemplateContext = () => {
@@ -33,17 +33,17 @@ export const useTemplateContext = () => {
 }
 
 export default function Template({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); // 获取当前路径
-  const router = useRouter(); // 用于编程式导航
+  const pathname = usePathname() // 获取当前路径
+  const router = useRouter() // 用于编程式导航
 
-  const [result, setResult] = useState<ExecutionResult | undefined>();
-  const [backgroundColor, setBackgroundColor] = useState('');
-  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<ExecutionResult | undefined>()
+  const [backgroundColor, setBackgroundColor] = useState('')
+  const [progress, setProgress] = useState(0)
 
   const chatId = useMemo(() => {
-    if (!pathname) return null;
-    return pathname.split('/').slice(-2)[0];
-  }, [pathname]);
+    if (!pathname) return null
+    return pathname.split('/').slice(-2)[0]
+  }, [pathname])
 
   // 定义路由与编号的映射关系
   const routeMap: { [key: string]: number } = {
@@ -51,42 +51,49 @@ export default function Template({ children }: { children: React.ReactNode }) {
     layout: 1,
     detail: 2,
     expand: 3,
-    finish: 4,
-  };
+    finish: 4
+  }
 
   useEffect(() => {
-    if (!pathname || !chatId) return;
+    let isMounted = true
 
-    const path = pathname.split('/').slice(-1)[0];
+    if (!pathname || !chatId) return
 
-    // 设置进度
-    if (path) {
-      setProgress(routeMap[path]);
+    const path = pathname.split('/').slice(-1)[0]
+
+    // 检查路径是否有效
+    if (path && Object.keys(routeMap).includes(path)) {
+      setProgress(routeMap[path])
+
+      // 仅在有效路径且非背景页时请求颜色
+      if (routeMap[path] !== 0) {
+        getColor(supabase, chatId).then((data) => {
+          if (isMounted && data) {
+            setBackgroundColor(data[0].backgroundColor)
+          }
+        })
+      }
     }
 
-    // 如果不是背景页，获取背景颜色
-    if (routeMap[path] !== 0) {
-      getColor(supabase, chatId).then((data) => {
-        if (data) {
-          setBackgroundColor(data[0].backgroundColor);
-          console.log(data[0].backgroundColor);
-        }
-      });
+    return () => {
+      isMounted = false
     }
-  }, [pathname, chatId]);
+  }, [pathname, chatId])
+
 
   // 如果 pathname 不存在，渲染一个占位内容
   if (!pathname) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
     <TemplateContext.Provider
+      key={pathname}
       value={{
         result,
         setResult,
         setBackgroundColor,
-        backgroundColor,
+        backgroundColor
       }}
     >
       <main className="flex min-h-screen max-h-screen">
@@ -101,5 +108,5 @@ export default function Template({ children }: { children: React.ReactNode }) {
         </div>
       </main>
     </TemplateContext.Provider>
-  );
+  )
 }
