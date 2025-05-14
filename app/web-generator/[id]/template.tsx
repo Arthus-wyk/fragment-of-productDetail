@@ -34,7 +34,6 @@ export const useTemplateContext = () => {
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() // 获取当前路径
-  const router = useRouter() // 用于编程式导航
 
   const [result, setResult] = useState<ExecutionResult | undefined>()
   const [backgroundColor, setBackgroundColor] = useState('')
@@ -87,26 +86,28 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <TemplateContext.Provider
-      key={pathname}
-      value={{
-        result,
-        setResult,
-        setBackgroundColor,
-        backgroundColor
-      }}
-    >
-      <main className="flex min-h-screen max-h-screen">
-        <div className="grid w-full md:grid-cols-2">
-          <GenerateInput
-            result={result}
-            setResult={setResult}
-            progress={progress}
-            chat_id={chatId || ''}
-          />
-          {children}
-        </div>
-      </main>
-    </TemplateContext.Provider>
+    <div >
+      <TemplateContext.Provider
+
+        value={{
+          result,
+          setResult,
+          setBackgroundColor,
+          backgroundColor
+        }}
+      >
+        <main className="flex min-h-screen max-h-screen">
+          <div className="grid w-full md:grid-cols-2">
+            <GenerateInput
+              result={result}
+              setResult={setResult}
+              progress={progress}
+              chat_id={chatId || ''}
+            />
+            {children}
+          </div>
+        </main>
+      </TemplateContext.Provider>
+    </div>
   )
 }

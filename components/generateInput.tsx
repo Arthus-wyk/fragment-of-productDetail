@@ -3,11 +3,7 @@
 import { Chat } from '@/components/chat'
 import { ChatInput } from '@/components/chat-input'
 import GenerateProgress from '@/components/generateProgress'
-import { NavBar } from '@/components/navbar'
-import { Preview } from '@/components/preview'
-import { AuthViewType, useAuth } from '@/lib/auth'
 import { Message, toAISDKMessages, toMessageImage } from '@/lib/messages'
-import { basePrompt } from '@/lib/prompt'
 import { artifactSchema, ArtifactSchema } from '@/lib/schema'
 import { TemplateId } from '@/lib/templates'
 import { ExecutionResult, questionQuery } from '@/lib/types'
@@ -17,7 +13,6 @@ import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
 import { Form } from 'antd'
-import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -39,14 +34,11 @@ export default function GenerateInput({
   )
   const [form] = Form.useForm()
 
-  const posthog = usePostHog()
   const [messages, setMessages] = useState<Message[]>([])
   const [codeMessage, setCodeMessages] = useState<Message>()
   const [fragment, setFragment] = useState<DeepPartial<ArtifactSchema>>()
-  const [isAuthDialogOpen, setAuthDialog] = useState(false)
-  const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
-  const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
+
   const lastMessage = messages[messages.length - 1]
   const { object, submit, isLoading, stop, error } = useObject({
     api: '/api/chat',
@@ -149,9 +141,7 @@ export default function GenerateInput({
   async function handleSubmitAuth(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if (!session) {
-      return setAuthDialog(true)
-    }
+
 
     if (isLoading) {
       stop()
@@ -228,7 +218,6 @@ export default function GenerateInput({
 
   return (
     <div className="flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
-      <NavBar session={session} showLogin={() => setAuthDialog(true)} />
       <GenerateProgress currentIndex={progress} />
       <>
         <Chat

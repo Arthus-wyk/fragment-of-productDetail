@@ -1,23 +1,39 @@
-import { Toaster } from '@/components/Toasts/toaster'
+'use client'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Suspense } from 'react'
+import { AuthViewType, useAuth } from '@/lib/auth'
+import { useState } from 'react'
+import { NavBar } from '@/components/navbar'
+import { supabase } from '@/lib/utils/supabase/client'
+import { AuthDialog } from '@/components/auth-dialog'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Fragments by AI',
-  description: "Open-source version of Anthropic's Artifacts",
-}
-
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children
+                                   }: Readonly<{
   children: React.ReactNode
 }>) {
+
+  const [authView, setAuthView] = useState<AuthViewType>('sign_in')
+  const [isAuthDialogOpen, setAuthDialog] = useState(false)
+  const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
+
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <>
+
+
+      {supabase && (
+        <AuthDialog
+          open={isAuthDialogOpen}
+          setOpen={setAuthDialog}
+          view={authView}
+          supabase={supabase}
+        />
+      )}
+      <NavBar session={session} showLogin={() => setAuthDialog(true)} />
+      {children}
+
+    </>
   )
 }

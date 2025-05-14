@@ -10,9 +10,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Product Generate Fragments '
+  title: 'Fragments by AI',
+  description: "Open-source version of Anthropic's Artifacts",
 }
-
 export default function RootLayout({
   children,
 }: Readonly<{

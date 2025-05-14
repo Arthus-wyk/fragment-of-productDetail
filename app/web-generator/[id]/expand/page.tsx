@@ -126,7 +126,6 @@ export default function WebGeneratorDetail() {
 
   return (
     <div
-      key={pathname}
       className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto"
     >
       <div className="w-full p-2">
