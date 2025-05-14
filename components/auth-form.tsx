@@ -59,7 +59,6 @@ function AuthForm({
           theme="default"
           showLinks={true}
           providers={['github', 'google']}
-          redirectTo="https://fragment-of-product-detail-dveq.vercel.app/web-generator/"
           providerScopes={{
             github: 'email',
           }}
