@@ -86,7 +86,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div >
       <TemplateContext.Provider
 
         value={{
@@ -96,8 +95,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
           backgroundColor
         }}
       >
-        <main className="flex min-h-screen max-h-screen">
-          <div className="grid w-full md:grid-cols-2">
+        <main className=" h-full">
+          <div className="grid h-full w-full md:grid-cols-2">
             <GenerateInput
               result={result}
               setResult={setResult}
@@ -108,6 +107,5 @@ export default function Template({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </TemplateContext.Provider>
-    </div>
   )
 }

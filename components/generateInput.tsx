@@ -12,16 +12,18 @@ import { addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
 import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
-import { Form } from 'antd'
+import { Button, Form } from 'antd'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import { ToolOutlined } from '@ant-design/icons'
+import { SheetTrigger } from '@/components/ui/sheet'
 
 export default function GenerateInput({
-  result,
-  setResult,
-  progress,
-  chat_id,
-}: {
+                                        result,
+                                        setResult,
+                                        progress,
+                                        chat_id
+                                      }: {
   result: ExecutionResult | undefined
   setResult: (result: ExecutionResult | undefined) => void
   progress: number
@@ -29,8 +31,9 @@ export default function GenerateInput({
 }) {
   const [chatInput, setChatInput] = useLocalStorage('chat', '')
   const [files, setFiles] = useState<string[]>([])
+  const [tool, setTool] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
-    'auto',
+    'auto'
   )
   const [form] = Form.useForm()
 
@@ -50,7 +53,6 @@ export default function GenerateInput({
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
-        console.log('fragment', fragment)
         if (fragment) {
           await addNewMessage(
             supabase,
@@ -59,41 +61,38 @@ export default function GenerateInput({
             fragment?.commentary || '',
             fragment?.title || '',
             fragment?.description || '',
-            fragment?.code || '',
+            fragment?.code || ''
           )
           setResult({ code: fragment.code })
         }
       }
-    },
+    }
   })
 
   const { data: messageData } = useQuery({
     queryKey: ['getMessages'],
     queryFn: async () => {
       const res = await getMessageList(supabase, chat_id)
-      if(res.success){
+      if (res.success) {
         return messages // 确保返回数据
-      }
-      else{
+      } else {
         return []
       }
-      
-    },
+
+    }
   })
 
-  useEffect(()=>{
-    if(result){
+  useEffect(() => {
+    if (result) {
       setCodeMessages({
-        role:'user',
-        content:[{
-          type:'code',
-          text:result.code
+        role: 'user',
+        content: [{
+          type: 'code',
+          text: result.code
         }]
       })
     }
-  },[result])
-
-
+  }, [result])
 
 
   //接收到模型的消息，加入消息队列
@@ -102,21 +101,21 @@ export default function GenerateInput({
       setFragment(object)
       const content: Message['content'] = [
         { type: 'text', text: object.commentary || '' },
-        { type: 'code', text: object.code || '' },
+        { type: 'code', text: object.code || '' }
       ]
 
       if (!lastMessage || lastMessage.role !== 'assistant') {
         addMessage({
           role: 'assistant',
           content,
-          object,
+          object
         })
       }
 
       if (lastMessage && lastMessage.role === 'assistant') {
         setMessage({
           content,
-          object,
+          object
         })
       }
     }
@@ -131,7 +130,7 @@ export default function GenerateInput({
       const updatedMessages = [...previousMessages]
       updatedMessages[index ?? previousMessages.length - 1] = {
         ...previousMessages[index ?? previousMessages.length - 1],
-        ...message,
+        ...message
       }
 
       return updatedMessages
@@ -140,9 +139,6 @@ export default function GenerateInput({
 
   async function handleSubmitAuth(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-
-
-
     if (isLoading) {
       stop()
     }
@@ -158,20 +154,20 @@ export default function GenerateInput({
 
     const updatedMessages = codeMessage
       ? [
-          codeMessage,
-          ...addMessage({
-            role: 'user',
-            content,
-          }),
-        ]
-      : addMessage({
+        codeMessage,
+        ...addMessage({
           role: 'user',
-          content,
+          content
         })
+      ]
+      : addMessage({
+        role: 'user',
+        content
+      })
 
     submit({
       messages: toAISDKMessages(updatedMessages),
-      step: progress,
+      step: progress
     })
     await addNewMessage(
       supabase,
@@ -180,7 +176,7 @@ export default function GenerateInput({
       chatInput,
       '',
       '',
-      '',
+      ''
     )
     setChatInput('')
     setFiles([])
@@ -190,7 +186,7 @@ export default function GenerateInput({
     const sendMessage = codeMessage ? [codeMessage, ...messages] : messages
     submit({
       messages: toAISDKMessages(sendMessage),
-      step: progress,
+      step: progress
     })
   }
 
@@ -204,7 +200,6 @@ export default function GenerateInput({
   }
 
   function handleFileChange(change: string[]) {
-    console.log('当前图片:', change)
     setFiles(change)
   }
 
@@ -216,28 +211,42 @@ export default function GenerateInput({
     setResult(preview.result)
   }
 
+  const handleToolOpen = () => {
+    setTool(!tool)
+    console.log(tool)
+  }
+
   return (
-    <div className="flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
-      <GenerateProgress currentIndex={progress} />
-      <>
-        <Chat
-          messages={messages}
-          isLoading={isLoading}
-          setCurrentPreview={setCurrentPreview}
-        />
-        <ChatInput
-          retry={retry}
-          isErrored={error !== undefined}
-          isLoading={isLoading}
-          isRateLimited={isRateLimited}
-          stop={stop}
-          input={chatInput}
-          handleInputChange={handleSaveInputChange}
-          handleSubmit={handleSubmitAuth}
-          files={files}
-          handleFileChange={handleFileChange}
-        />
-      </>
+    <div className="flex w-full h-full ">
+      <div className="flex h-full w-12 shadow-2xl border-1 border justify-center py-4 z-1000">
+        <div className="w-12 h-12 flex justify-center items-center border-y-1">
+          <SheetTrigger asChild>
+            <Button  icon={<ToolOutlined  style={{ fontSize: '24px', width: '24px', height: '24px' }} />} />
+          </SheetTrigger>
+        </div>
+      </div>
+      <div className="flex flex-col w-full h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
+        <GenerateProgress currentIndex={progress} />
+        <>
+          <Chat
+            messages={messages}
+            isLoading={isLoading}
+            setCurrentPreview={setCurrentPreview}
+          />
+          <ChatInput
+            retry={retry}
+            isErrored={error !== undefined}
+            isLoading={isLoading}
+            isRateLimited={isRateLimited}
+            stop={stop}
+            input={chatInput}
+            handleInputChange={handleSaveInputChange}
+            handleSubmit={handleSubmitAuth}
+            files={files}
+            handleFileChange={handleFileChange}
+          />
+        </>
+      </div>
     </div>
   )
 }

@@ -59,7 +59,7 @@ export function NavBar({
     window.open('/account', '_self')
   }
   return (
-    <nav className="flex h-14 p-4  sticky top-0 z-50  border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="flex h-14 p-4  sticky top-0  border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex flex-1 items-center">
         <Link href="/" className="flex items-center gap-2 " target="_blank">
           <Logo width={24} height={24} />

@@ -30,6 +30,8 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTemplateContext } from '../template'
+import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
+import { SheetContent } from '@/components/ui/sheet'
 
 export default function WebGeneratorDetail() {
   const router = useRouter() // 用于编程式导航
@@ -124,6 +126,11 @@ export default function WebGeneratorDetail() {
     <div
       className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto"
     >
+      <SheetContent side="left" className="w-[600px] sm:w-[740px] overflow-visible z-50">
+        <div className="p-4">
+          <DetailForm handleAISubmit={handleAISubmit} />
+        </div>
+      </SheetContent>
       <div className="w-full p-2">
         <Button
           onClick={() => mutateAsync()}
@@ -135,7 +142,6 @@ export default function WebGeneratorDetail() {
       <Divider style={{ borderColor: '#ffffff' }}>
         <h1 style={{ color: 'white', margin: 0 }}>信息</h1>
       </Divider>
-      <DetailForm handleAISubmit={handleAISubmit} />
 
       <div className="flex-grow overflow-auto">
         <FragmentPreview result={result} />

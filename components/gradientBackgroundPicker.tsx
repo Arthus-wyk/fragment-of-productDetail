@@ -1,10 +1,10 @@
-import { ArtifactSchema } from '@/lib/schema'
+
 import { ExecutionResult } from '@/lib/types'
 import {
   ArrowDownOutlined,
   ArrowRightOutlined,
   CloseOutlined,
-  PlusOutlined,
+  PlusOutlined
 } from '@ant-design/icons'
 import { DeepPartial } from 'ai'
 import {
@@ -17,22 +17,30 @@ import {
   Skeleton,
   Typography,
   Card,
-  Divider,
+  Divider
 } from 'antd'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { ColorResult, SketchPicker } from 'react-color'
+import { string } from 'zod'
+
+export type gradientStyleType={
+  background:string
+  width:string
+  borderRadius:string
+  padding:string
+}
 
 export default function GradientBackgroundPicker({
-  result,
-  setBackgroundColor,
-}: {
+                                                   result,
+                                                   onBgChange
+                                                 }: {
   result?: ExecutionResult
-  setBackgroundColor: (color: string) => void
+  onBgChange: (color: any) => void
 }) {
   const [colors, setColors] = useState(['#ffffff']) // 默认颜色数组
   const [gradientDirection, setGradientDirection] = useState('to right') // 渐变方向
   const [visibleColorPicker, setVisibleColorPicker] = useState<number | null>(
-    null,
+    null
   ) // 控制颜色选择器弹出
 
   // 更新颜色
@@ -67,19 +75,20 @@ export default function GradientBackgroundPicker({
   }
 
   // 生成渐变样式
-  const gradientStyle = {
-    background:
-      colors.length === 1
-        ? colors[0] // 单色背景
-        : `linear-gradient(${gradientDirection}, ${colors.join(', ')})`, // 渐变背景
-    width: '100%',
-    borderRadius: '4px',
-    padding: '20px',
-  }
+
   useEffect(() => {
-    console.log('set color')
-    setBackgroundColor(gradientStyle.background)
-  }, [colors])
+    const gradientStyle:gradientStyleType = {
+      background:
+        colors.length === 1
+          ? colors[0] // 单色背景
+          : `linear-gradient(${gradientDirection}, ${colors.join(', ')})`, // 渐变背景
+      width: '100%',
+      borderRadius: '4px',
+      padding: '20px'
+    }
+    onBgChange(gradientStyle)
+
+  }, [colors,gradientDirection])
 
   useEffect(() => {
     console.log(result)
@@ -140,18 +149,21 @@ export default function GradientBackgroundPicker({
           {colors.map((color, index) => (
             <div
               key={index}
-              className="relative group"
+              className="relative group z-100"
               style={{ width: 64, height: 64 }}
             >
               <Popover
                 placement="bottom"
                 content={
-                  <SketchPicker
-                    color={color}
-                    onChangeComplete={(newColor) =>
-                      updateColor(index, newColor)
-                    }
-                  />
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <SketchPicker
+                      className="z-100"
+                      color={color}
+                      onChangeComplete={(newColor) =>
+                        updateColor(index, newColor)
+                      }
+                    />
+                  </div>
                 }
                 trigger="click"
                 open={visibleColorPicker === index}
@@ -166,7 +178,7 @@ export default function GradientBackgroundPicker({
                     width: 56,
                     height: 56,
                     border: `2px solid ${color === '#FFFFFF' ? '#d9d9d9' : color}`,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                   }}
                   className="transition-transform hover:scale-105"
                 />
@@ -187,44 +199,6 @@ export default function GradientBackgroundPicker({
           ))}
         </Space>
       </Card>
-
-      {/* 展示区域 */}
-      <div className="w-full flex items-center justify-center">
-        <div
-          style={{
-            width: '70%',
-            marginBottom: '20px',
-            padding: '20px',
-            borderRadius: '15px',
-            background: 'rgba(255, 255, 255, 0.2)', // 半透明背景
-            boxShadow:
-              '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06)', // 模拟浮雕效果
-            backdropFilter: 'blur(10px)', // 背景模糊
-            WebkitBackdropFilter: 'blur(10px)', // 兼容 Safari
-            border: '1px solid rgba(255, 255, 255, 0.3)', // 边框
-          }}
-        >
-          <Typography.Text strong style={{marginBottom:"5px"}}>背景展示</Typography.Text>
-          <div style={gradientStyle}>
-            <Row gutter={[16, 16]}>
-              {/* 左侧商品图片 */}
-              <Skeleton.Image />
-              {/* 右侧商品信息 */}
-              <Col xs={36} md={12}>
-                <Skeleton active paragraph={{ rows: 4 }} />
-                {/* 模拟按钮 */}
-                <div style={{ marginTop: '16px' }}>
-                  <Skeleton.Button
-                    active
-                    style={{ width: '150px', marginRight: '10px' }}
-                  />
-                  <Skeleton.Button active style={{ width: '150px' }} />
-                </div>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

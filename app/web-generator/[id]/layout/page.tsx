@@ -15,6 +15,8 @@ import { Button, Divider, message } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 import { SetStateAction, useEffect, useState } from 'react'
 import { useTemplateContext } from '../template'
+import { SheetContent } from '@/components/ui/sheet'
+import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
 
 export default function WebGeneratorLayout() {
   const router = useRouter() // 用于编程式导航
@@ -98,6 +100,11 @@ export default function WebGeneratorLayout() {
     <div
       className="absolute md:relative top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y  h-full w-full flex flex-col overflow-auto"
     >
+      <SheetContent side="left" className="w-[600px] sm:w-[740px] overflow-visible z-50">
+        <div className="p-4">
+          <StyleSelect isLoading={isSubmitLoading} onSubmit={onSubmit} />
+        </div>
+      </SheetContent>
       <div className="w-full p-2">
         <Button onClick={() => mutateAsync()} loading={isLoading}>
           下一步
@@ -106,7 +113,7 @@ export default function WebGeneratorLayout() {
       <Divider style={{ borderColor: '#ffffff' }}>
         <h1 style={{ color: 'white', margin: 0 }}>布局</h1>
       </Divider>
-      <StyleSelect isLoading={isSubmitLoading} onSubmit={onSubmit} />
+
       <div className="flex-grow overflow-auto">
         <FragmentPreview result={result} />
       </div>

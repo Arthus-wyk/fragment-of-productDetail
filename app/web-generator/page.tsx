@@ -192,7 +192,7 @@ export default function WebGenerator() {
                       </div>
                       <div className="absolute bottom-2 right-2">
                         <Popconfirm
-                          title="确定删除该会员类型"
+                          title="确定删除该项目"
                           onConfirm={(event) =>
                             handleDeleteChat(event, project.id)
                           }

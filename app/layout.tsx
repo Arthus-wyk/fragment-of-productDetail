@@ -7,7 +7,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Suspense } from 'react'
 import { SpeedInsights } from "@vercel/speed-insights/next"
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin']})
 
 export const metadata: Metadata = {
   title: 'Fragments by AI',
@@ -19,9 +19,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className='h-full'>
       <PostHogProvider>
-        <body className={inter.className}>
+        <body className={inter.className} style={{height:'100%'}}>
         <SpeedInsights />
           <QueryProvider>
             <ThemeProvider
