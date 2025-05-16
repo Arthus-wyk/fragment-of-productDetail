@@ -11,12 +11,13 @@ import { supabase } from '@/lib/utils/supabase/client'
 import { updateCode } from '@/lib/utils/supabase/queries'
 import { useMutation } from '@tanstack/react-query'
 import { experimental_useObject as useObject } from 'ai/react'
-import { Button, Divider, message } from 'antd'
+import { Button } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTemplateContext } from '../template'
 import { SheetContent } from '@/components/ui/sheet'
-import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
+import { useNotificationContext } from '@/lib/utils/notificationProvider'
+
 
 export default function WebGeneratorLayout() {
   const router = useRouter() // 用于编程式导航
@@ -26,7 +27,7 @@ export default function WebGeneratorLayout() {
   const [isLoading, setIsLoading] = useState(false)
 
   const { result, setResult, backgroundColor } = useTemplateContext()
-
+  const {openNotificationWithIcon}=useNotificationContext()
   const {
     object,
     submit,
@@ -38,16 +39,18 @@ export default function WebGeneratorLayout() {
     schema: artifactSchema,
     onError: (error) => {
       if (error.message.includes('request limit')) {
-        message.error('You have reached your request limit for the day.')
+        openNotificationWithIcon('error','请求失败！', 'You have reached your request limit for the day.')
       } else {
-        message.error('An unexpected error has occurred.')
+        openNotificationWithIcon('error','请求失败！', 'An unexpected error has occurred.')
       }
       stop()
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
-        console.log('fragment', fragment)
-        if (fragment) setResult({ code: fragment.code })
+        if (fragment) {
+          setResult({ code: fragment.code })
+          updateCode(supabase, chat_id, fragment.code, 'layout')
+        }
       }
     },
   })
@@ -62,11 +65,11 @@ export default function WebGeneratorLayout() {
       if (result?.code) {
         const res = await updateCode(supabase, chat_id, result.code, 'detail')
         if (!res.success) {
-          message.error('代码更新失败：' + res.error)
+          openNotificationWithIcon('error','代码更新失败',String(res.error))
           setIsLoading(false)
         }
       } else {
-        throw new Error('result为空')
+        openNotificationWithIcon('error','获取代码失败！请刷新重试')
       }
     },
     onSuccess: () => {
@@ -75,7 +78,7 @@ export default function WebGeneratorLayout() {
     },
     onError: () => {
       setIsLoading(false)
-      message.error('请求失败，请稍后重试')
+      openNotificationWithIcon('error','获取代码失败！请刷新重试')
     },
   })
   const onSubmit = (style: string, layout: string) => {
