@@ -132,12 +132,12 @@ export default function StyleSelect({
         <Col >
           {/* 左侧：布局 */}
           <Title level={2}>布局</Title>
-          <Row xs={24} sm={12}>
+          <Row>
             {renderOptions(options[0])}
           </Row>
           {/* 右侧：风格 */}
           <Title level={2}>风格</Title>
-          <Row xs={24} sm={12}>
+          <Row>
             {renderOptions(options[1])}
           </Row>
           <div className="w-full flex justify-end">

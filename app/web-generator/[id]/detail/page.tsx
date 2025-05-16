@@ -17,13 +17,9 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTemplateContext } from '../template'
-<<<<<<< HEAD
-import GradientBackgroundPicker from '@/components/gradientBackgroundPicker'
 import { SheetContent } from '@/components/ui/sheet'
-=======
-import { NotificationType } from '@/app/web-generator/[id]/background/page'
 import { useNotificationContext } from '@/lib/utils/notificationProvider'
->>>>>>> f016cba8d9e52aff7ea8450154c7c5fc54edaa5e
+
 
 export default function WebGeneratorDetail() {
   const router = useRouter() // 用于编程式导航
