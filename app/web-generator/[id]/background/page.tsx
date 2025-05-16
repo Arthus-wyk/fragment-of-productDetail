@@ -34,8 +34,6 @@ export default function WebGeneratorBackground() {
       if (!res.success) {
         openNotificationWithIcon('error', '颜色更新失败', String(res.error))
         setIsLoading(false)
-      } else {
-        openNotificationWithIcon('error', '背景颜色未定义!')
       }
     },
     onSuccess: () => {

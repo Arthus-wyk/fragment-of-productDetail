@@ -59,9 +59,7 @@ export default function WebGeneratorDetail() {
   useEffect(() => {
     getCodeData()
   }, [])
-  useEffect(() => {
-    setResult({ code: originalLayout(backgroundColor) })
-  }, [backgroundColor])
+
   const { mutateAsync } = useMutation({
     mutationKey: ['addNewChat'],
     mutationFn: async () => {

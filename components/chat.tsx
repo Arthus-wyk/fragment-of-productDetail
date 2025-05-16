@@ -51,11 +51,13 @@ export function Chat({
           })}
           {message.object && (
             <div
-              onClick={() =>
+              onClick={() => {
+                console.log(message)
                 setCurrentPreview({
                   fragment: message.object,
-                  result: message.result,
+                  result: message.object
                 })
+              }
               }
               className="py-2 pl-2 w-full md:w-max flex items-center border rounded-xl select-none hover:bg-white dark:hover:bg-white/5 hover:cursor-pointer"
             >
