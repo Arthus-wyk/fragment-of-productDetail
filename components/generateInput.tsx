@@ -12,7 +12,7 @@ import { addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
 import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
-import { Button, Form } from 'antd'
+import { Button, Form, Popover } from 'antd'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import { ToolOutlined } from '@ant-design/icons'
@@ -221,7 +221,11 @@ export default function GenerateInput({
       <div className="flex h-full w-12 shadow-2xl border-1 border justify-center py-4 z-1000">
         <div className="w-12 h-12 flex justify-center items-center border-y-1">
           <SheetTrigger asChild>
-            <Button  icon={<ToolOutlined  style={{ fontSize: '24px', width: '24px', height: '24px' }} />} />
+            <Button>
+              <Popover placement="right" content="工具栏">
+                <ToolOutlined style={{ fontSize: 24 }} />
+              </Popover>
+            </Button>
           </SheetTrigger>
         </div>
       </div>

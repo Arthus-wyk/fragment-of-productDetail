@@ -24,15 +24,16 @@ export default function RootLayout({
 
   return (
     <div className="flex flex-col h-full w-full">
+      {supabase && (
+        <AuthDialog
+          open={isAuthDialogOpen}
+          setOpen={setAuthDialog}
+          view={authView}
+          supabase={supabase}
+        />
+      )}
       <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
-        {supabase && (
-          <AuthDialog
-            open={isAuthDialogOpen}
-            setOpen={setAuthDialog}
-            view={authView}
-            supabase={supabase}
-          />
-        )}
+
         <NavBar session={session} showLogin={() => setAuthDialog(true)} />
         {children}
       </Sheet>

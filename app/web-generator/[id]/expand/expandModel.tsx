@@ -26,23 +26,28 @@ export default function ExpandModel({
   const renderModuleContent = (module: { title: any; content: any }) => {
     return (
       <div className="flex flex-col items-start justify-center h-full">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-1 w-full">
           {module.title}
         </h3>
-        <p className="text-sm text-gray-600">{module.content}</p>
+        <p className="text-sm text-gray-600 line-clamp-3 break-words w-full">
+          {module.content}
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {preDefinedModules.map((module) => (
         <div
           key={module.id}
-          onDoubleClick={() => onEditModule(module.id)} // 双击触发编辑
-          className="w-80 h-52 bg-white shadow-lg rounded-lg cursor-pointer p-5 transform transition-transform hover:scale-105 hover:shadow-xl"
+          onDoubleClick={() => onEditModule(module.id)}
+          className=" h-52 bg-gray-100 shadow-lg rounded-lg cursor-pointer p-5 transform transition-transform hover:scale-105 hover:shadow-xl overflow-hidden flex flex-col"
         >
-          {renderModuleContent(module)}
+          {/* 让内容区撑满且裁剪 */}
+          <div className="flex-1 w-full overflow-hidden">
+            {renderModuleContent(module)}
+          </div>
         </div>
       ))}
     </div>

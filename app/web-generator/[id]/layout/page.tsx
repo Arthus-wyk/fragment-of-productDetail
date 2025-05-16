@@ -110,9 +110,7 @@ export default function WebGeneratorLayout() {
           下一步
         </Button>
       </div>
-      <Divider style={{ borderColor: '#ffffff' }}>
-        <h1 style={{ color: 'white', margin: 0 }}>布局</h1>
-      </Divider>
+
 
       <div className="flex-grow overflow-auto">
         <FragmentPreview result={result} />

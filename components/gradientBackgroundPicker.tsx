@@ -96,7 +96,7 @@ export default function GradientBackgroundPicker({
   }, [result])
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto p-4 bg-[#FFF1D9] rounded-lg shadow">
+    <div className="flex flex-col w-full max-w-4xl mx-auto p-4  rounded-lg shadow">
       {/* 标题部分 */}
       <div className="text-center mb-6">
         <Typography.Title level={3} className="!mb-2">
@@ -107,7 +107,7 @@ export default function GradientBackgroundPicker({
         </Typography.Text>
       </div>
       {/* 工具栏 */}
-      <Card className="!mb-4 bg-[#FFF1D9]" bodyStyle={{ padding: 16 }}>
+      <Card className="!mb-4 " bodyStyle={{ padding: 16 }}>
         <Space size="middle" align="center">
           <Button type="primary" icon={<PlusOutlined />} onClick={addColor}>
             添加颜色
@@ -118,18 +118,24 @@ export default function GradientBackgroundPicker({
           <Typography.Text strong>渐变方向：</Typography.Text>
           <Button.Group>
             <Button
+              color={gradientDirection === 'to right' ? 'cyan':undefined}
+              variant={gradientDirection === 'to right' ? "outlined":undefined}
               icon={<ArrowRightOutlined />}
               onClick={() => handleDirectionChange('to right')}
             >
               水平
             </Button>
             <Button
+              color={gradientDirection === 'to bottom' ? 'cyan':undefined}
+              variant={gradientDirection === 'to bottom' ? "outlined":undefined}
               icon={<ArrowDownOutlined />}
               onClick={() => handleDirectionChange('to bottom')}
             >
               垂直
             </Button>
             <Button
+              color={gradientDirection === 'to top right' ? 'cyan':undefined}
+              variant={gradientDirection === 'to top right' ? "outlined":undefined}
               icon={<ArrowRightOutlined />}
               onClick={() => handleDirectionChange('to top right')}
             >
@@ -141,7 +147,6 @@ export default function GradientBackgroundPicker({
 
       {/* 颜色选择区域 */}
       <Card
-        className="bg-[#FFF1D9]"
         title="颜色配置"
         bodyStyle={{ padding: 16 }}
       >
