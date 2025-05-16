@@ -2,7 +2,7 @@
 import { Duration } from '@/lib/duration'
 import { getModelClient, getDefaultMode } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
-import { backgroundPrompt, detailPrompt, layoutPrompt, toPrompt } from '@/lib/prompt'
+import { backgroundPrompt, detailPrompt, finalPrompt, layoutPrompt, toPrompt } from '@/lib/prompt'
 import { artifactSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
@@ -29,8 +29,8 @@ export async function POST(req: Request) {
   const prompt:{ [key: number]: string }={
     0:backgroundPrompt,
     1:layoutPrompt(),
-    2:detailPrompt()
-
+    2:detailPrompt(),
+    4:finalPrompt()
   }
 
   const modelClient = createGoogleGenerativeAI({

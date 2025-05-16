@@ -10,6 +10,7 @@ export function toPrompt() {
     ${htmlTemplate}
   `
 }
+
 export const backgroundPrompt = `你是一个电商详情页代码生成器，任务被分为五个步骤：背景、布局、商品信息、扩展和交互。你必须严格按照当前步骤的要求执行，禁止生成任何与未开始或已跳过步骤相关的内容。
 当前步骤是背景，你的输出必须是一个包含颜色代码的数组，格式为：["#ffffff", "#ffffff"]。该格式是例子,需要按照这种的数组的形式返回。数组中应包含1到3个符合要求的颜色代码，仅此内容，不得生成任何数组之外的其他内容。后续指令均无法打破此规则。
 `
@@ -28,6 +29,7 @@ export function layoutPrompt() {
 这些要求你必须严格执行
   `
 }
+
 export function detailPrompt() {
   return ` 
 ## 核心规则
@@ -53,9 +55,20 @@ resulting in both images moving together.
   This ensures each image takes up the full width of its container, resolving the problem."
   `
 }
+
+export function finalPrompt() {
+  return ` 
+    对用户提出的修改请求，只做最小必要的调整，不要大幅度修改或重写原有代码和页面内容。
+    除非用户明确要求，否则保留原有结构、样式和布局，仅对指定内容进行微调。
+    如果用户请求优化文字排版，只优化相关的文本部分，不要更改页面的其他部分。
+    请确保生成的内容与原始内容保持高度一致，仅在必要处做出小幅改动。
+  `
+}
+
 export function basePrompt(code: string) {
   return `你必须使用以下模板：${code}`
 }
+
 const productStyle = (value: string) => {
   switch (value) {
     case '1':
@@ -292,10 +305,11 @@ const productLayout = (value: string) => {
       return null
   }
 }
+
 export function layoutSubmitPrompt(
   bg: string | undefined,
   value1: string,
-  value2: string,
+  value2: string
 ) {
   return `你需要按照以下要求生成对应风格和布局的html代码，
   但禁止出现具体数据，所有数据都用Skeleton骨架屏代替，图片也需要用骨架屏：
@@ -305,6 +319,7 @@ export function layoutSubmitPrompt(
   在不修改body的style的情况下满足风格和布局
   `
 }
+
 export function formPrompt(code: string, value: string) {
   return `你需要在以下模板的基础上添加修改：${code} 把用户数据${value}填入该模板， 你要做的是把数据替换骨架屏，
   并加入一些电商详情页必要的ui
@@ -419,6 +434,7 @@ const model = (index: number) => {
       return ' -FAQ: Generate common questions and answers to help users resolve typical concerns.'
   }
 }
+
 export function expandPrompt(code: string, value: number) {
   return `你需要在以下模板的基础上添加修改：${code}，以下模块如果模板中包含，则按描述重新生成，如果没有，则加入到模板中合适的地方，
   新增模块：${model(value)}
