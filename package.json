@@ -54,6 +54,7 @@
     "qiniu": "^7.14.0",
     "react": "^18",
     "react-color": "^2.19.3",
+    "react-dialog": "^0.1.0",
     "react-dom": "^18",
     "react-merge-refs": "^2.1.1",
     "react-query": "^3.39.3",

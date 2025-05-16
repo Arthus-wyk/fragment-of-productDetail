@@ -8,7 +8,7 @@ import { artifactSchema, ArtifactSchema } from '@/lib/schema'
 import { TemplateId } from '@/lib/templates'
 import { ExecutionResult, questionQuery } from '@/lib/types'
 import { supabase } from '@/lib/utils/supabase/client'
-import { addNewMessage, getMessageList } from '@/lib/utils/supabase/queries'
+import { addNewMessage, getMessageList, updateCode } from '@/lib/utils/supabase/queries'
 import { useQuery } from '@tanstack/react-query'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
@@ -62,6 +62,7 @@ export default function GenerateInput({
             fragment?.code || '',
           )
           setResult({ code: fragment.code })
+          updateCode(supabase, chat_id, fragment.code, 'finish')
         }
       }
     },

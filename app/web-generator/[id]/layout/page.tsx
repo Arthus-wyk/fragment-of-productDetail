@@ -44,8 +44,10 @@ export default function WebGeneratorLayout() {
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
-        console.log('fragment', fragment)
-        if (fragment) setResult({ code: fragment.code })
+        if (fragment) {
+          setResult({ code: fragment.code })
+          updateCode(supabase, chat_id, fragment.code, 'layout')
+        }
       }
     },
   })

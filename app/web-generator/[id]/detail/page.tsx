@@ -37,7 +37,7 @@ export default function WebGeneratorDetail() {
   const [isLoading, setIsLoading] = useState(false)
   const basePath = pathname?.split('/').slice(0, -1).join('/')! // 获取 `/web-generator/:id`
   const chat_id = basePath?.split('/').slice(-1)[0]
-  const { result, setResult, backgroundColor } = useTemplateContext()
+  const { result, setResult } = useTemplateContext()
   const {
     object,
     submit,
@@ -56,8 +56,10 @@ export default function WebGeneratorDetail() {
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
-        console.log('fragment', fragment)
-        if (fragment) setResult({ code: fragment.code })
+        if (fragment) {
+          setResult({ code: fragment.code })
+          updateCode(supabase, chat_id, fragment.code, 'detail')
+        }
       }
     },
   })
@@ -75,9 +77,7 @@ export default function WebGeneratorDetail() {
   useEffect(() => {
     getCodeData()
   }, [])
-  useEffect(() => {
-    setResult({ code: originalLayout(backgroundColor) })
-  }, [backgroundColor])
+
   const { mutateAsync } = useMutation({
     mutationKey: ['addNewChat'],
     mutationFn: async () => {
