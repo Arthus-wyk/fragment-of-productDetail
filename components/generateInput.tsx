@@ -219,17 +219,19 @@ export default function GenerateInput({
 
   return (
     <div className="flex w-full h-full ">
-      <div className="flex h-full w-12 shadow-2xl border-1 border justify-center py-4 z-1000">
-        <div className="w-12 h-12 flex justify-center items-center border-y-1">
-          <SheetTrigger asChild>
-            <Button>
-              <Popover placement="right" content="工具栏">
-                <ToolOutlined style={{ fontSize: 24 }} />
-              </Popover>
-            </Button>
-          </SheetTrigger>
+      {progress !== 4 && (
+        <div className="flex h-full w-12 shadow-2xl border-1 border justify-center py-4 z-1000">
+          <div className="w-12 h-12 flex justify-center items-center border-y-1">
+            <SheetTrigger asChild>
+              <Button>
+                <Popover placement="right" content="工具栏">
+                  <ToolOutlined style={{ fontSize: 24 }} />
+                </Popover>
+              </Button>
+            </SheetTrigger>
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex flex-col w-full h-full max-w-[800px] mx-auto px-4 overflow-auto  col-span-1">
         <GenerateProgress currentIndex={progress} />
         <>

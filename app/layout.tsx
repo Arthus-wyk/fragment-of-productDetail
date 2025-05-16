@@ -20,10 +20,10 @@ export default function RootLayout({
 }>) {
   return (
 
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className='h-full'>
     <PostHogProvider>
       <NotificationProvider>
-        <body className={inter.className}>
+        <body className={inter.className} style={{height:'100%'}}>
         <SpeedInsights />
         <QueryProvider>
           <ThemeProvider
