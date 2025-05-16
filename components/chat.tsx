@@ -14,7 +14,7 @@ export function Chat({
   isLoading: boolean
   setCurrentPreview: (preview: {
     fragment: DeepPartial<ArtifactSchema> | undefined
-    result: ExecutionResult | undefined
+    result: any | undefined
   }) => void
 }) {
   useEffect(() => {
