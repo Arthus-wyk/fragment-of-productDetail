@@ -32,6 +32,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTemplateContext } from '../template'
+import { useNotificationContext } from '@/lib/utils/notificationProvider'
 
 export default function WebGeneratorDetail() {
   const router = useRouter() // 用于编程式导航
@@ -40,6 +41,7 @@ export default function WebGeneratorDetail() {
   const basePath = pathname?.split('/').slice(0, -1).join('/')! // 获取 `/web-generator/:id`
   const chat_id = basePath?.split('/').slice(-1)[0]
   const [isLoading, setIsLoading] = useState(false)
+  const {openNotificationWithIcon}=useNotificationContext()
 
   const { result, setResult } = useTemplateContext()
   const {
@@ -53,9 +55,9 @@ export default function WebGeneratorDetail() {
     schema: artifactSchema,
     onError: (error) => {
       if (error.message.includes('request limit')) {
-        message.error('You have reached your request limit for the day.')
+        openNotificationWithIcon('error','请求失败！', 'You have reached your request limit for the day.')
       } else {
-        message.error('An unexpected error has occurred.')
+        openNotificationWithIcon('error','请求失败！', 'An unexpected error has occurred.')
       }
     },
     onFinish: async ({ object: fragment, error }) => {
@@ -71,7 +73,7 @@ export default function WebGeneratorDetail() {
   const getCodeData = async () => {
     const res = await getCode(supabase, chat_id)
     if(!res.success){
-      message.error('获取代码失败！请刷新重试')
+      openNotificationWithIcon('error','获取代码失败！请刷新重试')
     }
     else if (res.chat){
       setResult({ code: res.chat[0].currentCode })
@@ -89,11 +91,11 @@ export default function WebGeneratorDetail() {
       if (result?.code) {
         const res = await updateCode(supabase, chat_id, result.code, 'finish')
         if (!res.success) {
-          message.error('代码更新失败：' + res.error)
+          openNotificationWithIcon('error','代码更新失败',String(res.error))
           setIsLoading(false)
         }
       } else {
-        throw new Error('result为空')
+        openNotificationWithIcon('error','获取代码失败！请刷新重试')
       }
     },
     onSuccess: (data) => {
@@ -101,7 +103,7 @@ export default function WebGeneratorDetail() {
     },
     onError: (error) => {
       setIsLoading(false)
-      message.error('请求失败，请稍后重试')
+      openNotificationWithIcon('error','请求失败，请稍后重试')
     },
   })
 
@@ -120,7 +122,7 @@ export default function WebGeneratorDetail() {
         step: 2,
       })
     } else {
-      message.error('当前模板为空！')
+      openNotificationWithIcon('error','当前模板为空！')
     }
   }
 

@@ -50,7 +50,6 @@ export default function GenerateInput({
     },
     onFinish: async ({ object: fragment, error }) => {
       if (!error) {
-        console.log('fragment', fragment)
         if (fragment) {
           await addNewMessage(
             supabase,
